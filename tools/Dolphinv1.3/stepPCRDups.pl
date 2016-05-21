@@ -31,7 +31,7 @@
  my $servicename      = "";
  my $help             = "";
  my $print_version    = "";
- my $version          = "picard_tools 1.131";
+ my $version          = "PCRdups";
 ################### PARAMETER PARSING ####################
 
 my $cmd=$0." ".join(" ",@ARGV); ####command line copy
