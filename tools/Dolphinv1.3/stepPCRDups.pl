@@ -76,10 +76,10 @@ die "Error 15: Cannot create the directory:".$puboutdir if ($?);
 
 print "INDIR:$indir\n";
 print "OUTDIR:$outdir\n";
-my $com="head -8 $indir/*.PCR_duplicates|grep -v \\\"#\\\"|grep -v \\\"LIB\\\" | sed \\\"s/==> //\\\" |sed \\\"s/.*0\\\\./0\\\\./\\\"|sed \\\"s/\\\\t.*//\\\"|sed \\\":a;{N;s/<==\\\\n\\\\n//g};ba\\\" | grep \\\" \\\" > $outdir/pcrdups.txt";
-$com.= " && mkdir -p $puboutdir/picard_$type";
-$com.= " && cp $outdir/pcrdups.txt $puboutdir/picard_$type/"; 
-$com.= " && echo -e \\\"$wkey\\t$version\\tsummary\\tpicard_$type/pcrdups.txt\\\" >> $puboutdir/reports.tsv ";
+my $com="head -8 $indir/*.PCR_duplicates|grep -v \\\"#\\\"|grep -v \\\"LIB\\\" | sed \\\"s/==> //\\\" |sed \\\"s/.*0\\\\./0\\\\./\\\"|sed \\\"s/\\\\t.*//\\\"|sed \\\":a;{N;s/<==\\\\n\\\\n//g};ba\\\" | grep \\\" \\\" > $outd/pcrdups.txt";
+$com.= " && mkdir -p $puboutdir/$type";
+$com.= " && cp $outd/pcrdups.txt $puboutdir/$type/"; 
+$com.= " && echo -e \\\"$wkey\\t$version\\tsummary\\t$type/pcrdups.txt\\\" >> $puboutdir/reports.tsv ";
 my $job="$jobsubmit -n $servicename -c \"$com\"";
 print $job."\n\n";
 `$job`;
