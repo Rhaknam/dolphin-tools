@@ -140,5 +140,8 @@
 @MULTIINTER       = @BIN/multiIntersectBed
 
 #RunCleaning Step
+@RUNSUMMARY         = @PERL @DOLPHIN/stepSummary.pl
+
+#RunCleaning Step
 @RUNCLEAN         = @PERL @DOLPHIN/stepClean.pl
 

@@ -174,10 +174,7 @@ foreach my $file (@files)
 	  $bname=$1;
 	  $bname=~s/.sorted//;
 	  $com="mkdir -p $outdir/pipe.rsem.$bname && $convertcmd $file $outdir/pipe.rsem.$bname/$bname && ";
-	  $com.="$rsemCmd $paired --bam $outdir/pipe.rsem.$bname/$bname.bam $rsemref $outdir/pipe.rsem.$bname/rsem.out.$bname && ";
-	  $com.="$samtools flagstat $outdir/pipe.rsem.$bname/$bname.bam > $outdir/".$bname.".flagstat.txt && ";
-	  $com.="mkdir -p $puboutdir/rsem && cp $outdir/".$bname.".flagstat.txt $puboutdir/rsem/. && ";
-	  $com.="echo \\\"$wkey\t$version\tsummary\trsem/$bname.flagstat.txt\\\" >> $puboutdir/reports.tsv ";
+	  $com.="$rsemCmd $paired --bam $outdir/pipe.rsem.$bname/$bname.bam $rsemref $outdir/pipe.rsem.$bname/rsem.out.$bname ";
   }
   my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
   print $job."\n";
