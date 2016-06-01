@@ -37,12 +37,12 @@ class stepGetTotalReads:
     command = "mkdir -p "+backupdir+" && gzip -c "+inputdir+"/"+filename+" > "+backupdir+"/"+filename+".gz && s=\$(zcat "+backupdir+"/"+filename+".gz|wc -l) && echo \$((\$s/4)) > "+backupdir+"/"+filename+".gz.count && md5sum "+backupdir+"/"+filename+".gz> "+backupdir+"/"+filename+".gz.md5sum"
     self.submitJob(JOBSUBMIT, "gzip_"+filename, command)
 
-  def getCount(self, JOBSUBMIT, outputdir, inputdir, filename):
+  def getCount(self, JOBSUBMIT, outputdir, inputdir, filename, dir_id):
     cat = "cat"
     if ('.gz' in filename):
         cat = "zcat"
     command = "mkdir -p "+outputdir+" && s=\$("+cat+" "+inputdir+"/"+filename+"|wc -l) && echo \$((\$s/4))  > "+outputdir+"/"+filename+".count"
-    self.submitJob(JOBSUBMIT, "count_"+filename, command)
+    self.submitJob(JOBSUBMIT, "count_"+filename+"_"+str(dir_id), command)
     
 def main():
     try:
@@ -95,6 +95,7 @@ def main():
         libname=sample['samplename']  
         filename=sample['file_name']
         fastq_dir=sample['fastq_dir']
+        dir_id = sample['dir_id']
         backup_dir=sample['backup_dir']
         
         print libname
@@ -104,13 +105,13 @@ def main():
         
         if (filename.find(',')!=-1):
             files=filename.split(',')
-            totalReads.getCount(JOBSUBMIT, inputdir + "/tmp", fastq_dir,  files[0])
-            totalReads.getCount(JOBSUBMIT, inputdir + "/tmp", fastq_dir,  files[1])
+            totalReads.getCount(JOBSUBMIT, inputdir + "/tmp", fastq_dir,  files[0], dir_id)
+            totalReads.getCount(JOBSUBMIT, inputdir + "/tmp", fastq_dir,  files[1], dir_id)
             if (not libname in processedLibs):
                 totalReads.gzipFileAndGetCount(JOBSUBMIT, inputdir, libname+".1.fastq", backup_dir)
                 totalReads.gzipFileAndGetCount(JOBSUBMIT, inputdir, libname+".2.fastq", backup_dir)
         else:
-            totalReads.getCount(JOBSUBMIT, inputdir + "/tmp", fastq_dir,  filename)
+            totalReads.getCount(JOBSUBMIT, inputdir + "/tmp", fastq_dir,  filename, dir_id)
             if (not libname in processedLibs):
                 totalReads.gzipFileAndGetCount(JOBSUBMIT, inputdir, libname+".fastq", backup_dir)
         processedLibs.append(libname)
