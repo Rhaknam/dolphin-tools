@@ -28,7 +28,8 @@
  my $jobsubmit        = "";
  my $type             = "";
  my $previous         = ""; 
- my $acmd             = ""; 
+ my $acmd             = "";
+ my $extraparams      = "";
  my $servicename      = "";
  my $help             = "";
  my $print_version    = "";
@@ -43,6 +44,7 @@ GetOptions(
     'previous=s'     => \$previous,
     'type=s'         => \$type,
     'acmd=s'         => \$acmd,
+	'extraparams=s'  => \$extraparams,
     'servicename=s'  => \$servicename,
     'jobsubmit=s'    => \$jobsubmit,
     'help'           => \$help, 
@@ -89,7 +91,9 @@ foreach my $chipline (@chiplibs)
  my @chipinput=split(/__tt__/,$chipline);
  $bname=$chipinput[0];
  my $chipfiles=getFiles($inputdir,$chipinput[1]);
- my $com="$acmd -t $chipfiles ";
+ $extraparams =~ s/,/ /g;
+ $extraparams =~ s/__cr____cn__/ /g;
+ my $com="$acmd $extraparams -t $chipfiles ";
  
  if (@chipinput>2 && length($chipinput[2])>=1)
  {
