@@ -86,12 +86,15 @@ def main():
     
     filelist=totalReads.getFileList(RUNPARAMSID, BARCODE)
     
+    print filelist;
+    
     inputdir=OUTDIR+"/input"
     if (BARCODE != "NONE"):
         inputdir=OUTDIR+"/seqmapping/barcode"
     
     processedLibs=[]
     for sample in filelist:
+        print processedLibs;
         libname=sample['samplename']  
         filename=sample['file_name']
         fastq_dir=sample['fastq_dir']

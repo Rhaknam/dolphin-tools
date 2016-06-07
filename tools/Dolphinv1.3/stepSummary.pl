@@ -23,10 +23,10 @@
  use File::Basename;
  use Getopt::Long;
  use Pod::Usage; 
+ use Data::Dumper;
 
 #################### VARIABLES ######################
  my $outdir           = "";
- my $level            = "";
  my $pubdir           = "";
  my $wkey             = "";
  my $username         = "";
@@ -66,54 +66,185 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 # Obtain summary information and create file
 
 my $reportfile   = "$pubdir/$wkey/reports.tsv";
+my $reportsummarydir = "$pubdir/$wkey/summary";
 my $outd   = "$outdir/summary";
-`mkdir -p $outdir`;
+`mkdir -p $reportsummarydir`;
+die "Error 15: Cannot create the directory:".$reportsummarydir if ($?);
+`mkdir -p $outd`;
 die "Error 15: Cannot create the directory:".$outdir if ($?);
 
+print Dumper($wkey);
+
 my %tsv;
+my @headers = ();
 my $count_files = `ls $outdir/counts/*.summary.tsv`;
 
-print $count_files."\n";
-if ($count_files !~/No such file or directory/)
-{
+push(@headers, 'Sample');
+push(@headers, 'Total Reads');
+
+print $count_files+"\n";
+if ( $count_files ne ""){
 	my @files = split(/[\n\r\s\t,]+/, $count_files);
 	my $filestr="";
 	foreach my $file (@files)
 	{
 		if ($file eq $files[-1]) {
 			#append final counts
-			parseCountFile($file, 1);
+			parseRNACountFile($file, 1);
 		}else{
 			#only add specific counts
-			parseCountFile($file, 0);
+			parseRNACountFile($file, 0);
 		}
 	}
+}else{
+	parseNormalCounts();
 }
 
 my $rsem_dir = getDirectory($outdir, 'rsem');
-my $tophat_dir = getDirectory($outdir, 'tophat');
-my $chip_dir = getDirectory($outdir, 'chip');
+if ($rsem_dir ne "") {
+	checkAlignmentType($rsem_dir, "rsem");
+}
 
-sub parseCountFile
+my $tophat_dir = getDirectory($outdir, 'tophat');
+if ($tophat_dir ne "") {
+	checkAlignmentType($tophat_dir, "tophat");
+}
+
+my $chip_dir = getDirectory($outdir, 'chip');
+if ($chip_dir ne "") {
+	checkAlignmentType($chip_dir, "chip");
+}
+
+print Dumper(@headers);
+print Dumper(%tsv);
+
+my @keys = keys %tsv;
+my $summary = "$outd/summary_data.tsv";
+my $header_string = join("\t", @headers);
+`echo "$header_string" > $summary`;
+`echo "$header_string" > $reportsummarydir/summary.tsv`;
+foreach my $key (@keys){
+	my $values = join("\t", @{ $tsv{$key} });
+	`echo "$values" >> $summary`;
+	`echo "$values" >> $reportsummarydir/summary.tsv`;
+}
+
+`echo "$wkey\t$version\tsummary\tsummary/summary.tsv" >> $reportfile`;
+
+###############
+# SUBROUTINES #
+###############
+
+sub parseRNACountFile
 {
 	my ($file) = $_[0];
 	my ($end_file) = $_[1];
 	my $contents_full = `cat $file`;
-	my @contents_array = split(/[\n\r,]+/, $count_files);
+	my @contents_array = split(/[\n\r,]+/, $contents_full);
 	foreach my $contents_sample (@contents_array)
 	{
 		my @contents_sample_array = split(/[\t,]+/, $contents_sample);
-		if ($tsv{$contents_sample_array[0]} eq undef) {
-			$tsv{$contents_sample_array[0]} = [$contents_sample_array[1]];
+		if ($contents_sample_array[0] ne 'File') {
+			if ($tsv{$contents_sample_array[0]} eq undef) {
+				$tsv{$contents_sample_array[0]} = [$contents_sample_array[0], $contents_sample_array[1]];
+			}
+			my @reads1 = split(/[\s,]+/, $contents_sample_array[5]);
+			push($tsv{$contents_sample_array[0]}, $reads1[0]);
+			if ($end_file) {
+				my @totalreads = split(/[\s\t,]+/, $contents_sample_array[2]);
+				push($tsv{$contents_sample_array[0]}, $totalreads[0]);
+			}
 		}
-		
-		my @reads1 = split(/[\s,]+/, $contents_sample_array[3]);
-		my @readsgt1 = split(/[\s,]+/, $contents_sample_array[4]);
-		
-		$tsv{$contents_sample_array[0]} = push($tsv{$contents_sample_array[0]}, ($reads1[0] + $readsgt1[0]));
-		if ($end_file eq 1) {
-			$tsv{$contents_sample_array[0]} = push($tsv{$contents_sample_array[0]}, $contents_sample_array[2]);
+	}
+	my @split_file = split(/[\/]+/, $file);
+	my @split_name = split(/[\.]+/, $split_file[-1]);
+	push(@headers, $split_name[0]);
+	if ($end_file) {
+		push(@headers, 'Total align');
+	}
+}
+
+sub parseNormalCounts
+{
+	chomp(my $contents = `ls $outdir/input`);
+	my @files = split(/[\n]+/, $contents);
+	foreach my $file (@files){
+		my @split_name = split(/[\.]+/, $file);
+		chomp(my $rawcount = `wc -l $outdir/input/$file`);
+		my @counts = split(/[ ]+/, $rawcount);
+		my $finalcount = $counts[0]/4;
+		$tsv{$split_name[0]} = [$split_name[0], $finalcount];
+	}
+}
+
+sub checkAlignmentType
+{
+	my $directories = $_[0];
+	my $type = $_[1];
+	my @dirs = split(/[\n]+/, $directories);
+	if(grep( /^$outdir\/dedupmerge$type$/, @dirs )) {
+		dedupReadsAligned("$outdir/dedupmerge$type", $type);
+	}elsif(grep( /^$outdir\/dedup$type$/, @dirs )){
+		dedupReadsAligned("$outdir/dedup$type", $type);
+	}elsif(grep( /^$outdir\/merge$type$/, @dirs )){
+		readsAligned("$outdir/merge$type", $type);
+	}elsif(grep( /^$outdir\/$type$/, @dirs )){
+		if ($type eq "tophat") {
+			tophatAligned("$outdir/$type", $type);
+		}else{
+			readsAligned("$outdir/$type", $type);
 		}
+	}
+}
+
+sub readsAligned
+{
+	my ($directory) = $_[0];
+	my ($type) = $_[1];
+	chomp(my $contents = `ls $directory/*flagstat*`);
+	my @files = split(/[\n]+/, $contents);
+	push(@headers, "Reads Aligned: $type");
+	foreach my $file (@files){
+		my @split_name = split(/[\/]+/, $file);
+		my @namelist = split(/[\.]+/, $split_name[-1]);
+		my $name = $namelist[0];
+		chomp(my $aligned = `cat $file | awk '{print \$2}'`);
+		push($tsv{$name}, $aligned);
+	}
+}
+
+sub dedupReadsAligned
+{
+	my ($directory) = $_[0];
+	my ($type) = $_[1];
+	chomp(my $contents = `ls $directory/*PCR_duplicates`);
+	my @files = split(/[\n]+/, $contents);
+	push(@headers, "Duplicated Reads: $type", "Reads Aligned: $type");
+	foreach my $file (@files){
+		my @split_name = split(/[\/]+/, $file);
+		my @namelist = split(/[\.]+/, $split_name[-1]);
+		my $name = $namelist[0];
+		chomp(my $aligned = `cat $file | grep -A 1 \"LIB\" | grep -v \"LIB\"`);
+		my @values = split("\t", $aligned);
+		my $dedup = ($values[2] * $values[7]);
+		my $total = $values[2] - int($dedup);
+		push($tsv{$name}, int($dedup).'', $total.'');
+	}
+}
+
+sub tophatAligned
+{
+	my ($directory) = $_[0];
+	my ($type) = $_[1];
+	chomp(my $contents = `ls $directory/*/accepted_hits.bam`);
+	my @files = split(/[\n]+/, $contents);
+	push(@headers, "Reads Aligned: $type");
+	foreach my $file (@files){
+		my @split_name = split(/[\/]+/, $file);
+		my @namelist = split(/[\.]+/, $split_name[-2]);
+		my $name = $namelist[2];
+		chomp(my $aligned = `samtools view -F 256 $file | wc - l | awk '{print \$1/2}'`);
+		push($tsv{$name}, $aligned);
 	}
 }
 
@@ -121,7 +252,8 @@ sub getDirectory
 {
 	my ($outdir) = $_[0];
 	my ($type) = $_[1];
-	my $directories = `ls -d $outdir/*$type*`;
+	chomp(my $directories = `ls -d $outdir/*$type*`);
+	return $directories;
 }
 
 __END__

@@ -80,8 +80,8 @@ foreach my $file (@files)
 {
 	$file=~/.*\/(.*).bam/;
 	my $bname=$1;
-	$com ="$samtools view -F 256 $outdir/$type/$bname.bam | wc -l > $outdir/".$bname.".flagstat.txt && ";
-	$com.="mkdir -p $pubdir/$type && cp $outdir/".$bname.".flagstat.txt $pubdir/$type/. && ";
+	$com ="$samtools view -F 256 $outdir/$type/$bname.bam | wc -l | awk '{print \$1/2}'> $outdir/$type/".$bname.".flagstat.txt && ";
+	$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type/. && ";
 	$com.="echo \\\"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\\\" >> $pubdir/reports.tsv ";
 	`$com`;
 	die "Error 25: Cannot run the command:".$com if ($?);
