@@ -70,22 +70,42 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 
 my $reportfile = "$pubdir/$wkey/reports.tsv";
 my $inputdir = "$outdir/$type";
+if ($type eq "tophat") {
+	$inputdir = "$outdir/$type/pipe*";
+	my $com=`ls -d $inputdir 2>&1`;
+	die "Error 64: please check if you defined the parameters right:$inputdir" unless ($com !~/No such file or directory/);
+	print $com;
+	my @dirs = split(/[\n\r\s\t,]+/, $com);
+	
+	foreach my $dir (@dirs)
+	{
+		my @samplename = split(/\./, $dir);
+		my $bname=$samplename[-1];
+		$com ="$samtools view -F 256 $dir/accepted_hits.bam | wc -l | awk '{printf int(\$1/2)\"\\n\"}'> $outdir/$type/".$bname.".flagstat.txt && ";
+		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type/. && ";
+		$com.="echo \\\"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\\\" >> $pubdir/reports.tsv ";
+		`$com`;
+		die "Error 25: Cannot run the command:".$com if ($?);
+	}
 
-my $com=`ls $inputdir/*.bam 2>&1`;
-die "Error 64: please check if you defined the parameters right:$inputdir" unless ($com !~/No such file or directory/);
-
-my @files = split(/[\n\r\s\t,]+/, $com);
-
-foreach my $file (@files)
-{
-	$file=~/.*\/(.*).bam/;
-	my $bname=$1;
-	$com ="$samtools view -F 256 $outdir/$type/$bname.bam | wc -l | awk '{print \$1/2}'> $outdir/$type/".$bname.".flagstat.txt && ";
-	$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type/. && ";
-	$com.="echo \\\"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\\\" >> $pubdir/reports.tsv ";
-	`$com`;
-	die "Error 25: Cannot run the command:".$com if ($?);
+}else{
+	my $com=`ls $inputdir/*.bam 2>&1`;
+	die "Error 64: please check if you defined the parameters right:$inputdir" unless ($com !~/No such file or directory/);
+	
+	my @files = split(/[\n\r\s\t,]+/, $com);
+	
+	foreach my $file (@files)
+	{
+		$file=~/.*\/(.*).bam/;
+		my $bname=$1;
+		$com ="$samtools view -F 256 $inputdir/$bname.bam | wc -l | awk '{print \$1/2}'> $outdir/$type/".$bname.".flagstat.txt && ";
+		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type/. && ";
+		$com.="echo \\\"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\\\" >> $pubdir/reports.tsv ";
+		`$com`;
+		die "Error 25: Cannot run the command:".$com if ($?);
+	}
 }
+
 
 __END__
 

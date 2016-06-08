@@ -119,29 +119,32 @@
 @BED12FILE          = @GDB/@VERSION.bed
 
 #RunAggregation
-@RUNAGGREGATION   = @PERL @DOLPHIN/stepAGG.pl
-@REFACT           = @GDB/refACT.tab
-@BTOOLSGENCOV     = @RUNCOVERAGE
-@INTOPDF          = "R --file=@BIN/ACT/intopdf.R"
-@ACT              = "@PYTHON @BIN/ACT/ACT.py --radius=5000 --nbins=50 --mbins=50 --region"
+@RUNAGGREGATION     = @PERL @DOLPHIN/stepAGG.pl
+@REFACT             = @GDB/refACT.tab
+@BTOOLSGENCOV       = @RUNCOVERAGE
+@INTOPDF            = "R --file=@BIN/ACT/intopdf.R"
+@ACT                = "@PYTHON @BIN/ACT/ACT.py --radius=5000 --nbins=50 --mbins=50 --region"
 
 #BISULPHITE PIPELINE
-@RUNBSMAP         = @PERL @DOLPHIN/stepBSMap.pl
-@BSMAPCMD         = @BIN/bsmap
-@RUNMCALL         = @PERL @DOLPHIN/stepMCall.pl
-@RUNMETHYLKIT     = @PERL @DOLPHIN/stepMethylKit.pl
-@RUNDIFFMETH      = @PERL @DOLPHIN/stepDiffMeth.pl
+@RUNBSMAP           = @PERL @DOLPHIN/stepBSMap.pl
+@BSMAPCMD           = @BIN/bsmap
+@RUNMCALL           = @PERL @DOLPHIN/stepMCall.pl
+@RUNMETHYLKIT       = @PERL @DOLPHIN/stepMethylKit.pl
+@RUNDIFFMETH        = @PERL @DOLPHIN/stepDiffMeth.pl
 
 #Step Haplotype
-@RUNHAPLOTYPE     = @PERL @DOLPHIN/stepHaplotype.pl
-@HAPLOTYPECMD     = "@JAVA -jar @BIN/GenomeAnalysisTK.jar"
-@HAPLOBED         = @GDB/bed
-@BEDTOOLS         = @BIN/bedtools
-@MULTIINTER       = @BIN/multiIntersectBed
+@RUNHAPLOTYPE       = @PERL @DOLPHIN/stepHaplotype.pl
+@HAPLOTYPECMD       = "@JAVA -jar @BIN/GenomeAnalysisTK.jar"
+@HAPLOBED           = @GDB/bed
+@BEDTOOLS           = @BIN/bedtools
+@MULTIINTER         = @BIN/multiIntersectBed
 
-#RunCleaning Step
+#RunAlignmentCount Step
+@RUNALIGNMENTCOUNT  = @PERL @DOLPHIN/stepAlignmentCount.pl
+
+#RunSummary Step
 @RUNSUMMARY         = @PERL @DOLPHIN/stepSummary.pl
 
 #RunCleaning Step
-@RUNCLEAN         = @PERL @DOLPHIN/stepClean.pl
+@RUNCLEAN           = @PERL @DOLPHIN/stepClean.pl
 

@@ -141,18 +141,35 @@ sub parseRNACountFile
 	my ($end_file) = $_[1];
 	my $contents_full = `cat $file`;
 	my @contents_array = split(/[\n\r,]+/, $contents_full);
+	my %unmapped_dir = {};
 	foreach my $contents_sample (@contents_array)
 	{
 		my @contents_sample_array = split(/[\t,]+/, $contents_sample);
+		print Dumper(@contents_sample_array);
 		if ($contents_sample_array[0] ne 'File') {
 			if ($tsv{$contents_sample_array[0]} eq undef) {
 				$tsv{$contents_sample_array[0]} = [$contents_sample_array[0], $contents_sample_array[1]];
 			}
+			if ($tsv{$contents_sample_array[0]}[1] != undef) {
+				if ($tsv{$contents_sample_array[0]}[1] < $contents_sample_array[1]) {
+					$tsv{$contents_sample_array[0]}[1]= $contents_sample_array[1];
+				}
+			}
+			if ($tsv{$contents_sample_array[0]}[1] != undef) {
+				if ($tsv{$contents_sample_array[0]}[1] < $contents_sample_array[1]) {
+					$tsv{$contents_sample_array[0]}[1]= $contents_sample_array[1];
+				}
+			}
+			
+			my @totalreads = split(/[\s\t,]+/, $contents_sample_array[2]);
+			if ($unmapped_dir{$contents_sample_array[0]} == undef || $unmapped_dir{$contents_sample_array[0]} >= $totalreads[0]) {
+				$unmapped_dir{$contents_sample_array[0]} = $totalreads[0];
+			}
+			
 			my @reads1 = split(/[\s,]+/, $contents_sample_array[5]);
 			push($tsv{$contents_sample_array[0]}, $reads1[0]);
 			if ($end_file) {
-				my @totalreads = split(/[\s\t,]+/, $contents_sample_array[2]);
-				push($tsv{$contents_sample_array[0]}, $totalreads[0]);
+				push($tsv{$contents_sample_array[0]}, $unmapped_dir{$contents_sample_array[0]});
 			}
 		}
 	}
@@ -203,7 +220,7 @@ sub readsAligned
 	my ($type) = $_[1];
 	chomp(my $contents = `ls $directory/*flagstat*`);
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Reads Aligned: $type");
+	push(@headers, "Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
@@ -219,7 +236,7 @@ sub dedupReadsAligned
 	my ($type) = $_[1];
 	chomp(my $contents = `ls $directory/*PCR_duplicates`);
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Duplicated Reads: $type", "Reads Aligned: $type");
+	push(@headers, "Duplicated Reads $type", "Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
@@ -238,7 +255,7 @@ sub tophatAligned
 	my ($type) = $_[1];
 	chomp(my $contents = `ls $directory/*/accepted_hits.bam`);
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Reads Aligned: $type");
+	push(@headers, "Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
