@@ -29,6 +29,7 @@
  my $outdir           = "";
  my $pubdir           = "";
  my $wkey             = "";
+ my $samtools         = "";
  my $username         = "";
  my $config           = "";
  my $help             = "";
@@ -42,6 +43,7 @@ GetOptions(
 	'outdir=s'       => \$outdir,
     'pubdir=s'       => \$pubdir,
     'wkey=s'         => \$wkey,
+	'samtools=s'     => \$samtools,
     'config=s'       => \$config,
     'username=s'     => \$username,
 	'help'           => \$help, 
@@ -265,7 +267,7 @@ sub alteredAligned
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
 		my $name = $namelist[2];
-		chomp(my $aligned = `samtools view -F 256 $file | wc - l | awk '{print \$1/2}'`);
+		chomp(my $aligned = `$samtools view -F 256 $file | wc - l | awk '{print \$1/2}'`);
 		push($tsv{$name}, $aligned);
 	}
 }
