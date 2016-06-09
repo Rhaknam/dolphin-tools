@@ -253,6 +253,9 @@ sub dedupReadsAligned
 		my @values = split("\t", $aligned);
 		my $dedup = ($values[2] * $values[7]);
 		my $total = $values[2] - int($dedup);
+		print Dumper($name);
+		print Dumper($dedup);
+		print Dumper($total);
 		push($tsv{$name}, int($dedup).'');
 		push($tsv{$name}, $total.'');
 	}
