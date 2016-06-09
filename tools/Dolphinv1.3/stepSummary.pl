@@ -145,6 +145,7 @@ sub parseRNACountFile
 	foreach my $contents_sample (@contents_array)
 	{
 		my @contents_sample_array = split(/[\t,]+/, $contents_sample);
+		print Dumper(@contents_sample_array);
 		if ($contents_sample_array[0] ne 'File') {
 			if ($tsv{$contents_sample_array[0]} eq undef) {
 				$tsv{$contents_sample_array[0]} = [$contents_sample_array[0], $contents_sample_array[1]];
