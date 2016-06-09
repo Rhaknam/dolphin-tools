@@ -73,8 +73,6 @@ die "Error 15: Cannot create the directory:".$reportsummarydir if ($?);
 `mkdir -p $outd`;
 die "Error 15: Cannot create the directory:".$outdir if ($?);
 
-print Dumper($wkey);
-
 my %tsv;
 my @headers = ();
 my $count_files = `ls $outdir/counts/*.summary.tsv`;
@@ -115,9 +113,6 @@ if ($chip_dir ne "") {
 	checkAlignmentType($chip_dir, "chip");
 }
 
-print Dumper(@headers);
-print Dumper(%tsv);
-
 my @keys = keys %tsv;
 my $summary = "$outd/summary_data.tsv";
 my $header_string = join("\t", @headers);
@@ -145,7 +140,6 @@ sub parseRNACountFile
 	foreach my $contents_sample (@contents_array)
 	{
 		my @contents_sample_array = split(/[\t,]+/, $contents_sample);
-		print Dumper(@contents_sample_array);
 		if ($contents_sample_array[0] ne 'File') {
 			if ($tsv{$contents_sample_array[0]} eq undef) {
 				$tsv{$contents_sample_array[0]} = [$contents_sample_array[0], $contents_sample_array[1]];
@@ -198,12 +192,14 @@ sub checkAlignmentType
 {
 	my $directories = $_[0];
 	my $type = $_[1];
+	my $deduptype = $type;
+	$deduptype = $type."_ref.transcripts" if ($type eq "rsem");
 	my @dirs = split(/[\n]+/, $directories);
-	if(grep( /^$outdir\/dedupmerge$type$/, @dirs )) {
-		dedupReadsAligned("$outdir/dedupmerge$type", $type);
-	}elsif(grep( /^$outdir\/dedup$type$/, @dirs )){
-		dedupReadsAligned("$outdir/dedup$type", $type);
-	}elsif(grep( /^$outdir\/merge$type$/, @dirs )){
+	if(grep( /^$outdir\/dedupmerge$deduptype/, @dirs )) {
+		dedupReadsAligned("$outdir/dedupmerge$deduptype", $type);
+	}elsif(grep( /^$outdir\/dedup$deduptype/, @dirs )){
+		dedupReadsAligned("$outdir/dedup$deduptype", $type);
+	}elsif(grep( /^$outdir\/merge$type/, @dirs )){
 		readsAligned("$outdir/merge$type", $type);
 	}elsif(grep( /^$outdir\/$type$/, @dirs )){
 		if ($type eq "tophat") {
