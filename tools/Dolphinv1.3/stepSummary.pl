@@ -202,11 +202,11 @@ sub checkAlignmentType
 	$deduptype = $type."_ref.transcripts" if ($type eq "rsem");
 	print $deduptype;
 	my @dirs = split(/[\n]+/, $directories);
-	if(grep( /^$outdir\/dedupmerge$deduptype/, @dirs )) {
+	if(grep( /^$outdir\/dedupmerge$deduptype$/, @dirs )) {
 		dedupReadsAligned("$outdir/dedupmerge$deduptype", $type);
-	}elsif(grep( /^$outdir\/dedup$deduptype/, @dirs )){
+	}elsif(grep( /^$outdir\/dedup$deduptype$/, @dirs )){
 		dedupReadsAligned("$outdir/dedup$deduptype", $type);
-	}elsif(grep( /^$outdir\/merge$type/, @dirs )){
+	}elsif(grep( /^$outdir\/merge$type$/, @dirs )){
 		readsAligned("$outdir/merge$type", $type);
 	}elsif(grep( /^$outdir\/$type$/, @dirs )){
 		if ($type eq "tophat"){
@@ -244,6 +244,7 @@ sub dedupReadsAligned
 	print $contents;
 	my @files = split(/[\n]+/, $contents);
 	push(@headers, "Duplicated Reads $type", "Reads Aligned $type");
+	print Dumper(@headers);
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
@@ -268,7 +269,7 @@ sub alteredAligned
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
 		my $name = $namelist[2];
-		chomp(my $aligned = `$samtools view -F 256 $file | wc - l | awk '{print \$1/2}'`);
+		chomp(my $aligned = `$samtools view -F 256 $file | wc - l | awk '{print int(\$1/2)}'`);
 		push($tsv{$name}, $aligned);
 	}
 }
