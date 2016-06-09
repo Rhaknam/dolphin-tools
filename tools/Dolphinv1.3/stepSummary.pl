@@ -202,8 +202,10 @@ sub checkAlignmentType
 	}elsif(grep( /^$outdir\/merge$type/, @dirs )){
 		readsAligned("$outdir/merge$type", $type);
 	}elsif(grep( /^$outdir\/$type$/, @dirs )){
-		if ($type eq "tophat") {
-			tophatAligned("$outdir/$type", $type);
+		if ($type eq "tophat"){
+			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam");
+		}elsif ($type eq "rsem"){
+			alteredAligned("$outdir/$type", $type, "*/*transcript.bam");
 		}else{
 			readsAligned("$outdir/$type", $type);
 		}
@@ -245,11 +247,12 @@ sub dedupReadsAligned
 	}
 }
 
-sub tophatAligned
+sub alteredAligned
 {
 	my ($directory) = $_[0];
 	my ($type) = $_[1];
-	chomp(my $contents = `ls $directory/*/accepted_hits.bam`);
+	my ($filetype) = $_[2];
+	chomp(my $contents = `ls $directory/$filetype`);
 	my @files = split(/[\n]+/, $contents);
 	push(@headers, "Reads Aligned $type");
 	foreach my $file (@files){
