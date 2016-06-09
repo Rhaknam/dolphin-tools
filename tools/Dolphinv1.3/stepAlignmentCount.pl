@@ -70,7 +70,7 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 
 my $reportfile = "$pubdir/$wkey/reports.tsv";
 my $inputdir = "$outdir/$type";
-if ($type eq "tophat") {
+if ($type eq "tophat" || $type eq "rsem") {
 	$inputdir = "$outdir/$type/pipe*";
 	my $com=`ls -d $inputdir 2>&1`;
 	die "Error 64: please check if you defined the parameters right:$inputdir" unless ($com !~/No such file or directory/);
