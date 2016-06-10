@@ -71,24 +71,23 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 
 my $reportfile = "$pubdir/$wkey/reports.tsv";
 my $inputdir = "$outdir/$type";
+$inputdir = "$outdir/seqmapping/chip" if ($type eq "chip");
 if ($type eq "tophat" || $type eq "rsem") {
-	$inputdir = "$outdir/$type/pipe*";
-	my $com=`ls -d $inputdir 2>&1`;
+	my $com=`ls -d $outdir/$type/pipe* 2>&1`;
 	die "Error 64: please check if you defined the parameters right:$inputdir" unless ($com !~/No such file or directory/);
-	print $com;
 	my @dirs = split(/[\n\r\s\t,]+/, $com);
 	my $bamfile = "accepted_hits.bam";
 	$bamfile = "*transcript.bam" if ($type eq "rsem");
 	foreach my $dir (@dirs)
-	{
+	{       
 		my @samplename = split(/\./, $dir);
 		my $bname=$samplename[-1];
-		$com ="$samtools view -F 4 $dir/$bamfile | wc -l | awk '{printf int(\$1/2)}'> $outdir/$type/".$bname.".flagstat.txt && ";
-		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type && ";
+		$com ="$samtools view -F 256 $dir/$bamfile | wc -l | awk '{printf int(\$1/2)}'> $inputdir/".$bname.".flagstat.txt && ";
+		$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname.".flagstat.txt $pubdir/$wkey/$type && ";
 		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
-		`$com`;
+		my $retval=`$com`;
 		die "Error 25: Cannot run the command:".$com if ($?);
-	}
+    }
 
 }else{
 	my $com=`ls $inputdir/*.bam 2>&1`;
@@ -100,10 +99,14 @@ if ($type eq "tophat" || $type eq "rsem") {
 	{
 		$file=~/.*\/(.*).bam/;
 		my $bname=$1;
-		$com ="$samtools view -F 4 $inputdir/$bname.bam | wc -l | awk '{print int(\$1/2)}'> $outdir/$type/".$bname.".flagstat.txt && ";
-		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type && ";
-		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
-		`$com`;
+		my $bname2 = $bname;
+		$bname2=~s/\.sorted//;
+		print Dumper($bname);
+		print Dumper($bname2);
+		$com ="$samtools view -F 256 $inputdir/$bname.bam | wc -l | awk '{print int(\$1/2)}'> $inputdir/".$bname2.".flagstat.txt && ";
+		$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname2.".flagstat.txt $pubdir/$wkey/$type && ";
+		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname2.flagstat.txt\" >> $reportfile ";
+		my $retval = `$com`;
 		die "Error 25: Cannot run the command:".$com if ($?);
 	}
 }

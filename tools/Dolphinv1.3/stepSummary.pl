@@ -116,6 +116,11 @@ my $chip_dir = getDirectory($outdir, 'chip');
 print $chip_dir;
 if ($chip_dir ne "") {
 	checkAlignmentType($chip_dir, "chip");
+}else{
+	my $chip_seq_dir = getDirectory($outdir, "seqmapping/chip");
+	if ($chip_seq_dir ne "") {
+		checkAlignmentType($chip_seq_dir, "chip");
+	}
 }
 
 my @keys = keys %tsv;
@@ -216,6 +221,8 @@ sub checkAlignmentType
 		}else{
 			readsAligned("$outdir/$type", $type);
 		}
+	}elsif($type eq "chip"){
+		readsAligned("$outdir/seqmapping/chip", $type);
 	}
 }
 
@@ -231,7 +238,10 @@ sub readsAligned
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
 		my $name = $namelist[0];
-		chomp(my $aligned = `cat $file | awk '{print \$2}'`);
+		 chomp(my $aligned = `cat $file | awk '{print \$2}'`);
+			if ($aligned eq ""){
+				chomp($aligned = `cat $file | awk '{print \$1}'`);
+			}
 		push($tsv{$name}, $aligned);
 	}
 }
