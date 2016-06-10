@@ -244,20 +244,16 @@ sub dedupReadsAligned
 	print $contents;
 	my @files = split(/[\n]+/, $contents);
 	push(@headers, "Duplicated Reads $type", "Reads Aligned $type");
-	print Dumper(@headers);
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
 		my $name = $namelist[0];
-		my @namelist2 = split(/[_PCR_Duplicates]+/, $name);
+		my @namelist2 = split(/_PCR_duplicates/, $name);
 		$name = $namelist2[0];
 		chomp(my $aligned = `cat $file | grep -A 1 \"LIB\" | grep -v \"LIB\"`);
 		my @values = split("\t", $aligned);
 		my $dedup = ($values[2] * $values[7]);
 		my $total = $values[2] - int($dedup);
-		print Dumper($name);
-		print Dumper(int($dedup));
-		print Dumper($total);
 		push($tsv{$name}, int($dedup).'');
 		push($tsv{$name}, $total.'');
 	}
@@ -269,13 +265,14 @@ sub alteredAligned
 	my ($type) = $_[1];
 	my ($filetype) = $_[2];
 	chomp(my $contents = `ls $directory/$filetype`);
+	print $contents;
 	my @files = split(/[\n]+/, $contents);
 	push(@headers, "Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
 		my $name = $namelist[2];
-		chomp(my $aligned = `$samtools view -F 256 $file | wc - l | awk '{print int(\$1/2)}'`);
+		chomp(my $aligned = `$samtools view -F 256 $file | wc -l | awk '{print int(\$1/2)}'`);
 		push($tsv{$name}, $aligned);
 	}
 }

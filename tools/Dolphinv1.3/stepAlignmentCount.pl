@@ -22,7 +22,8 @@
  use strict;
  use File::Basename;
  use Getopt::Long;
- use Pod::Usage; 
+ use Pod::Usage;
+ use Data::Dumper;
 
 #################### VARIABLES ######################
  my $outdir           = "";
@@ -83,8 +84,8 @@ if ($type eq "tophat" || $type eq "rsem") {
 		my @samplename = split(/\./, $dir);
 		my $bname=$samplename[-1];
 		$com ="$samtools view -F 256 $dir/$bamfile | wc -l | awk '{printf int(\$1/2)}'> $outdir/$type/".$bname.".flagstat.txt && ";
-		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type/. && ";
-		$com.="echo \\\"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\\\" >> $pubdir/reports.tsv ";
+		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type && ";
+		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
 		`$com`;
 		die "Error 25: Cannot run the command:".$com if ($?);
 	}
@@ -100,8 +101,8 @@ if ($type eq "tophat" || $type eq "rsem") {
 		$file=~/.*\/(.*).bam/;
 		my $bname=$1;
 		$com ="$samtools view -F 256 $inputdir/$bname.bam | wc -l | awk '{print int(\$1/2)}'> $outdir/$type/".$bname.".flagstat.txt && ";
-		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type/. && ";
-		$com.="echo \\\"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\\\" >> $pubdir/reports.tsv ";
+		$com.="mkdir -p $pubdir/$type && cp $outdir/$type/".$bname.".flagstat.txt $pubdir/$type && ";
+		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
 		`$com`;
 		die "Error 25: Cannot run the command:".$com if ($?);
 	}
