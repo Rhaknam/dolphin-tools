@@ -27,7 +27,7 @@
 
 #################### VARIABLES ######################
  my $outdir           = "";
- my $samtools		  = "";
+ my $samtools         = "";
  my $type             = "";
  my $pubdir           = "";
  my $wkey             = "";
@@ -101,8 +101,6 @@ if ($type eq "tophat" || $type eq "rsem") {
 		my $bname=$1;
 		my $bname2 = $bname;
 		$bname2=~s/\.sorted//;
-		print Dumper($bname);
-		print Dumper($bname2);
 		$com ="$samtools view -F 256 $inputdir/$bname.bam | wc -l | awk '{print int(\$1/2)}'> $inputdir/".$bname2.".flagstat.txt && ";
 		$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname2.".flagstat.txt $pubdir/$wkey/$type && ";
 		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname2.flagstat.txt\" >> $reportfile ";

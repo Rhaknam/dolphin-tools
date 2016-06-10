@@ -83,6 +83,7 @@ push(@headers, 'Sample');
 push(@headers, 'Total Reads');
 
 print $count_files+"\n";
+
 if ( $count_files ne ""){
 	my @files = split(/[\n\r\s\t,]+/, $count_files);
 	my $filestr="";
@@ -101,19 +102,16 @@ if ( $count_files ne ""){
 }
 
 my $rsem_dir = getDirectory($outdir, 'rsem');
-print $rsem_dir;
 if ($rsem_dir ne "") {
 	checkAlignmentType($rsem_dir, "rsem");
 }
 
 my $tophat_dir = getDirectory($outdir, 'tophat');
-print $tophat_dir;
 if ($tophat_dir ne "") {
 	checkAlignmentType($tophat_dir, "tophat");
 }
 
 my $chip_dir = getDirectory($outdir, 'chip');
-print $chip_dir;
 if ($chip_dir ne "") {
 	checkAlignmentType($chip_dir, "chip");
 }else{
@@ -150,7 +148,6 @@ sub parseRNACountFile
 	foreach my $contents_sample (@contents_array)
 	{
 		my @contents_sample_array = split(/[\t,]+/, $contents_sample);
-		print Dumper(@contents_sample_array);
 		if ($contents_sample_array[0] ne 'File') {
 			if ($tsv{$contents_sample_array[0]} eq undef) {
 				$tsv{$contents_sample_array[0]} = [$contents_sample_array[0], $contents_sample_array[1]];
@@ -205,7 +202,6 @@ sub checkAlignmentType
 	my $type = $_[1];
 	my $deduptype = $type;
 	$deduptype = $type."_ref.transcripts" if ($type eq "rsem");
-	print $deduptype;
 	my @dirs = split(/[\n]+/, $directories);
 	if(grep( /^$outdir\/dedupmerge$deduptype$/, @dirs )) {
 		dedupReadsAligned("$outdir/dedupmerge$deduptype", $type);
