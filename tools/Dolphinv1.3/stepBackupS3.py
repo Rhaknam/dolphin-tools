@@ -91,13 +91,13 @@ class stepBackup:
       ret=''
     return ret
 
-  def updateInitialFileCounts(self, file_id, tablename, inputdir, filename, paired):
+  def updateInitialFileCounts(self, file_id, tablename, inputdir, filename, paired, dir_id):
    try: 
       count=-1
       if (paired):
           files=filename.split(',')
-          firstCount=self.getValfromFile(inputdir+'/tmp/'+files[0]+'.count')
-          secondCount=self.getValfromFile(inputdir+'/tmp/'+files[1]+'.count')
+          firstCount=self.getValfromFile(inputdir+'/tmp/'+files[0]+'.'+dir_id+'.count')
+          secondCount=self.getValfromFile(inputdir+'/tmp/'+files[1]+'.'+dir_id+'.count')
   
           if (firstCount == secondCount):
               count=firstCount
@@ -107,7 +107,7 @@ class stepBackup:
               print "%s"%(inputdir+'/tmp/'+files[1]+'.count')
               #sys.exit(85)
       else:
-          count=self.getValfromFile(inputdir+'/tmp/'+filename+'.count')
+          count=self.getValfromFile(inputdir+'/tmp/'+filename+'.'+dir_id+'.count')
       if (count != ""):
          data = urllib.urlencode({'func':'updateInitialFileCounts', 'tablename':str(tablename), 'total_reads':str(count), 'file_id':str(file_id)})
          ret = eval(self.f.queryAPI(self.url, data, "updateInitialFileCounts:"+str(count)))
@@ -258,16 +258,17 @@ def main():
         filename=sample['file_name']
         backup_dir=sample['backup_dir']
         amazon_bucket=sample['amazon_bucket']
+        dir_id=sample['dir_id']
 
         PAIRED=None
         if (filename.find(',')!=-1):
            PAIRED="Yes"
     
-        backup.updateInitialFileCounts(file_id, tablename, inputdir, filename, PAIRED)
+        backup.updateInitialFileCounts(file_id, tablename, inputdir, filename, PAIRED, dir_id)
         if (not [libname, sample_id] in processedLibs):
             backup.processFastqFiles(sample, PAIRED)
             processedLibs.append([libname, sample_id])
-
+    print processedLibs
 
     if (AMAZONUPLOAD.lower() != "no" and amazon!=() and amazon_bucket!=""):
       amazon_bucket = str(re.sub('s3://', '', amazon_bucket))

@@ -41,7 +41,7 @@ class stepGetTotalReads:
     cat = "cat"
     if ('.gz' in filename):
         cat = "zcat"
-    command = "mkdir -p "+outputdir+" && s=\$("+cat+" "+inputdir+"/"+filename+"|wc -l) && echo \$((\$s/4))  > "+outputdir+"/"+filename+".count"
+    command = "mkdir -p "+outputdir+" && s=\$("+cat+" "+inputdir+"/"+filename+"|wc -l) && echo \$((\$s/4))  > "+outputdir+"/"+filename+"."+dir_id+".count"
     self.submitJob(JOBSUBMIT, "count_"+filename+"_"+str(dir_id), command)
     
 def main():
