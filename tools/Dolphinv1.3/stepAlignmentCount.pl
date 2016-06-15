@@ -82,7 +82,7 @@ if ($type eq "tophat" || $type eq "rsem") {
 	{       
 		my @samplename = split(/\./, $dir);
 		my $bname=$samplename[-1];
-		$com ="$samtools view $dir/$bamfile | awk '{print \$1}' | sort -u | wc -l | awk '{print \$1}' > $inputdir/".$bname.".flagstat.txt && ";
+		$com ="$samtools view -F 4 $dir/$bamfile | awk '{print \$1}' | sort -u | wc -l | awk '{print \$1}' > $inputdir/".$bname.".flagstat.txt && ";
 		$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname.".flagstat.txt $pubdir/$wkey/$type && ";
 		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
 		my $retval=`$com`;
@@ -101,7 +101,7 @@ if ($type eq "tophat" || $type eq "rsem") {
 		my $bname=$1;
 		my $bname2 = $bname;
 		$bname2=~s/\.sorted//;
-		$com ="$samtools view $inputdir/$bname.bam | awk '{print \$1}' | sort -u | wc -l | awk '{print \$1}' > $inputdir/".$bname2.".flagstat.txt && ";
+		$com ="$samtools view -F 4 $inputdir/$bname.bam | awk '{print \$1}' | sort -u | wc -l | awk '{print \$1}' > $inputdir/".$bname2.".flagstat.txt && ";
 		$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname2.".flagstat.txt $pubdir/$wkey/$type && ";
 		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname2.flagstat.txt\" >> $reportfile ";
 		my $retval = `$com`;
