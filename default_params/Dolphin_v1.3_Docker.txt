@@ -3,6 +3,7 @@
 @PYTHON           = python
 @JAVA             = java
 @SAMTOOLS         = samtools
+@SAMTOOLS         = samtools
 @BIN              = /usr/local/bin/dolphin-bin
 @DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
 @GDB              = /export/genome_data/@GENOME/@VERSION
