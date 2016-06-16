@@ -278,8 +278,11 @@ sub alteredAligned
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
 		my $name = $namelist[2];
-		chomp(my $aligned = `$samtools view -F 4 $file | wc -l | awk '{print int(\$1/2)}'`);
-		push($tsv{$name}, $aligned);
+		chomp(my $aligned = `$samtools flagstat $file`);
+		my @aligned_split = split(/[\n]+/, $aligned);
+		my @paired = split(/[\s]+/, $aligned_split[9]);
+		my @singleton = split(/[\s]+/, $aligned_split[10]);
+		push($tsv{$name}, (int($paired[0])/2) + int($singleton[0]));
 	}
 }
 
