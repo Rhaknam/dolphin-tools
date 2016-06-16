@@ -3,9 +3,9 @@
 @PYTHON           = module load python/2.7.5 && python 
 @JAVA             = module load java/1.7.0_25 && java
 @RPROG            = module load R/3.0.1
-@SAMTOOLS         = "module load  samtools/0.0.19 && samtools"
-@SAMTOOLS1        = "module load  samtools/1.2 && samtools"
+@SAMTOOLS         = "module load samtools/0.0.19 && samtools"
 @BIN              = /project/umw_biocore/bin
+@SAMTOOLSFLAG     = "module load samtools/1.2 && samtools"
 @DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
 @GDB              = /share/data/umw_biocore/genome_data/@GENOME/@VERSION
 @GCOMMONDB        = @GDB/commondb

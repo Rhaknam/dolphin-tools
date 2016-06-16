@@ -77,7 +77,7 @@ die "Error 15: Cannot create the directory:".$outdir if ($?);
 
 my %tsv;
 my @headers = ();
-my $count_files = `ls $outdir/counts/*.summary.tsv`;
+my $count_files = `ls $outdir/counts/*.summary.tsv 2>/dev/null`;
 
 push(@headers, 'Sample');
 push(@headers, 'Total Reads');
@@ -287,7 +287,7 @@ sub getDirectory
 {
 	my ($outdir) = $_[0];
 	my ($type) = $_[1];
-	chomp(my $directories = `ls -d $outdir/*$type*`);
+	chomp(my $directories = `ls -d $outdir/*$type* 2>/dev/null`);
 	return $directories;
 }
 
