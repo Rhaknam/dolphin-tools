@@ -280,14 +280,14 @@ sub alteredAligned
 		my $name = $namelist[2];
 		chomp(my $aligned = `$samtools flagstat $file`);
 		my @aligned_split = split(/[\n]+/, $aligned);
-		print Dumper(@aligned_split);
 		my @paired = split(/[\s]+/, $aligned_split[9]);
-		print Dumper(@paired);
 		my @singleton = split(/[\s]+/, $aligned_split[10]);
-		print Dumper(@singleton);
-		print Dumper((int($paired[0])/2) + int($singleton[0]));
-		push($tsv{$name}, (int($paired[0])/2) + int($singleton[0])."");
-		print Dumper(%tsv);
+		if ((int($paired[0])/2) + int($singleton[0]) == 0) {
+			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+			push($tsv{$name}, $aligned);
+		}else{
+			push($tsv{$name}, (int($paired[0])/2) + int($singleton[0])."");
+		}
 	}
 }
 
