@@ -134,11 +134,7 @@ foreach my $d (@files){
   
   if ($cmdname eq "MarkDuplicates") {
     $com.= "&& $samtools index $outd/".$libname.".bam ";
-    $com.= "&& $samtools flagstat $outd/".$libname.".bam > $outd/".$libname.".flagstat.txt ";
     $com.= "&& md5sum $outd/".$libname.".bam > $outd/".$libname.".bam.md5sum ";
-	$com.= "&& mkdir -p $puboutdir/dedup$type ";
-	$com.= "&& cp $outd/".$libname.".flagstat.txt $puboutdir/dedup$type/. ";
-	$com.= "&& echo \\\"$wkey\t$version\tsummary\tdedup$type/$libname.flagstat.txt\\\" >> $puboutdir/reports.tsv ";
   }
   elsif ($cmdname eq "CollectMultipleMetrics") {
     $com .= "&& mkdir -p $outd/".$libname."_multi && mv $outd/$libname*.pdf $outd/".$libname."_multi/. ";
