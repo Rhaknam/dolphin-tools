@@ -28,7 +28,6 @@
 #################### VARIABLES ######################
  my $outdir           = "";
  my $samtools         = "";
- my $matepaired       = "";
  my $type             = "";
  my $pubdir           = "";
  my $wkey             = "";
@@ -44,7 +43,6 @@ my $command=$0." ".join(" ",@ARGV); ####command line copy
 GetOptions( 
 	'outdir=s'       => \$outdir,
 	'samtools=s'     => \$samtools,
-	'matepaired=s'   => \$matepaired,
 	'type=s'         => \$type,
     'pubdir=s'       => \$pubdir,
     'wkey=s'         => \$wkey,
