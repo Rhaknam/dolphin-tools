@@ -213,7 +213,7 @@ sub checkAlignmentType
 		if ($type eq "tophat"){
 			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam");
 		}elsif ($type eq "rsem"){
-			alteredAligned("$outdir/$type", $type, "*/*transcript.bam");
+			alteredAligned("$outdir/$type", $type, "*/*genome.bam");
 		}else{
 			readsAligned("$outdir/$type", $type);
 		}
