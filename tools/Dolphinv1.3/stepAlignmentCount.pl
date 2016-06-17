@@ -80,8 +80,8 @@ if ($type eq "tophat" || $type eq "rsem") {
 	$bamfile = "*transcript.bam" if ($type eq "rsem");
 	foreach my $dir (@dirs)
 	{       
-		my @samplename = split(/\./, $dir);
-		my $bname=$samplename[-1];
+		$dir=~/.*\/(.*).transcript.bam/;
+		my $bname=$1;
 		$com ="$samtools flagstat $dir/$bamfile > $inputdir/".$bname.".flagstat.txt && ";
 		$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname.".flagstat.txt $pubdir/$wkey/$type && ";
 		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
