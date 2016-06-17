@@ -71,9 +71,7 @@ my $reportfile   = "$pubdir/$wkey/reports.tsv";
 my $reportsummarydir = "$pubdir/$wkey/summary";
 my $outd   = "$outdir/summary";
 `mkdir -p $reportsummarydir`;
-die "Error 15: Cannot create the directory:".$reportsummarydir if ($?);
 `mkdir -p $outd`;
-die "Error 15: Cannot create the directory:".$outdir if ($?);
 
 my %tsv;
 my @headers = ();
@@ -213,7 +211,7 @@ sub checkAlignmentType
 		if ($type eq "tophat"){
 			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam");
 		}elsif ($type eq "rsem"){
-			alteredAligned("$outdir/$type", $type, "*/*genome.bam");
+			alteredAligned("$outdir/$type", $type, "*/*transcript.bam");
 		}else{
 			readsAligned("$outdir/$type", $type);
 		}
