@@ -74,19 +74,20 @@ my $inputdir = "$outdir/$type";
 $inputdir = "$outdir/seqmapping/chip" if ($type eq "chip");
 if ($type eq "tophat" || $type eq "rsem") {
 	my $com=`ls -d $outdir/$type/pipe* 2>&1`;
-	die "Error 64: please check if you defined the parameters right:$inputdir" unless ($com !~/No such file or directory/);
 	my @dirs = split(/[\n\r\s\t,]+/, $com);
 	my $bamfile = "accepted_hits.bam";
 	$bamfile = "*transcript.bam" if ($type eq "rsem");
 	foreach my $dir (@dirs)
 	{       
-		my @samplename = split(/pipe\.$type\./, $dir);
-		my $bname=$samplename[-1];
-		$com ="$samtools flagstat $dir/$bamfile > $inputdir/".$bname.".flagstat.txt && ";
-		$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname.".flagstat.txt $pubdir/$wkey/$type && ";
-		$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
-		my $retval=`$com`;
-		die "Error 25: Cannot run the command:".$com if ($?);
+		if (`ls $dir/$bamfile` !~/No such file or directory/) {
+			my @samplename = split(/pipe\.$type\./, $dir);
+			my $bname=$samplename[-1];
+			$com ="$samtools flagstat $dir/$bamfile > $inputdir/".$bname.".flagstat.txt && ";
+			$com.="mkdir -p $pubdir/$wkey/$type && cp $inputdir/".$bname.".flagstat.txt $pubdir/$wkey/$type && ";
+			$com.="echo \"$wkey\t$version\tsummary\t$type/$bname.flagstat.txt\" >> $reportfile ";
+			my $retval=`$com`;
+			die "Error 25: Cannot run the command:".$com if ($?);
+		}
     }
 
 }else{
