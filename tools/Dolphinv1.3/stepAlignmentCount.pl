@@ -76,13 +76,17 @@ if ($type eq "tophat" || $type eq "rsem") {
 	my $com=`ls -d $outdir/$type/pipe* 2>&1`;
 	my @dirs = split(/[\n\r\s\t,]+/, $com);
 	my $bamfile = "accepted_hits.bam";
-	$bamfile = "*transcript.bam" if ($type eq "rsem");
-	print Dumper($com);
-	print Dumper(@dirs);
+	$bamfile = "*genome.bam" if ($type eq "rsem");
 	
 	if ($com !~ /No such file or directory/) {
 		foreach my $dir (@dirs)
 		{
+			if ($bamfile eq "*genome.bam") {
+				my $genome_check = `ls $outdir/$type/*/*genome.bam`;
+				if ($genome_check =~ /No such file or directory/) {
+					$bamfile = "*transcript.bam";
+				}
+			}
 			my @samplename = split(/pipe\.$type\./, $dir);
 			my $bname=$samplename[-1];
 			$com ="$samtools flagstat $dir/$bamfile > $inputdir/".$bname.".flagstat.txt && ";
