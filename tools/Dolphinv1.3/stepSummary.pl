@@ -206,7 +206,7 @@ sub checkAlignmentType
 	}elsif(grep( /^$outdir\/dedup$deduptype$/, @dirs )){
 		dedupReadsAligned("$outdir/dedup$deduptype", $type);
 	}elsif(grep( /^$outdir\/merge$type$/, @dirs )){
-		readsAligned("$outdir/merge$type", $type);
+		readsAligned("$outdir/merge$type", "$type");
 	}elsif(grep( /^$outdir\/$type$/, @dirs )){
 		if ($type eq "tophat"){
 			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam");
@@ -224,19 +224,24 @@ sub readsAligned
 {
 	my ($directory) = $_[0];
 	my ($type) = $_[1];
-	chomp(my $contents = `ls $directory/*flagstat*`);
+	chomp(my $contents = `ls $directory/*.bam`);
 	print $contents;
 	my @files = split(/[\n]+/, $contents);
 	push(@headers, "Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
-		my @namelist = split(/[\.]+/, $split_name[-1]);
+		my @namelist = split(/[\.bam]+/, $split_name[-1]);
 		my $name = $namelist[0];
-		 chomp(my $aligned = `cat $file | awk '{print \$2}'`);
-			if ($aligned eq ""){
-				chomp($aligned = `cat $file | awk '{print \$1}'`);
-			}
-		push($tsv{$name}, $aligned);
+		chomp(my $aligned = `$samtools flagstat $file`);
+		my @aligned_split = split(/[\n]+/, $aligned);
+		my @paired = split(/[\s]+/, $aligned_split[9]);
+		my @singleton = split(/[\s]+/, $aligned_split[10]);
+		if ((int($paired[0])/2) + int($singleton[0]) == 0) {
+			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+			push($tsv{$name}, $aligned);
+		}else{
+			push($tsv{$name}, ((int($paired[0])/2) + int($singleton[0]))."");
+		}
 	}
 }
 
