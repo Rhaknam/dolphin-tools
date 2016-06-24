@@ -206,7 +206,7 @@ sub checkAlignmentType
 	}elsif(grep( /^$outdir\/dedup$deduptype$/, @dirs )){
 		dedupReadsAligned("$outdir/dedup$deduptype", $type);
 	}elsif(grep( /^$outdir\/merge$type$/, @dirs )){
-		readsAligned("$outdir/merge$type", "$type");
+		readsAligned("$outdir/merge$type", $type);
 	}elsif(grep( /^$outdir\/$type$/, @dirs )){
 		if ($type eq "tophat"){
 			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam");
