@@ -244,8 +244,8 @@ sub dedupReadsAligned
 		chomp(my $multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
 		chomp(my $aligned = `cat $file | grep -A 1 \"LIB\" | grep -v \"LIB\"`);
 		my @values = split("\t", $aligned);
-		my $dedup = int($values[5]);
-		my $total = int($values[2]) - $dedup - int($multimapped);
+		my $dedup = int($values[5]) + int($values[4]);
+		my $total = int($values[2]) + int($values[1]) - $dedup - int($multimapped);
 		push($tsv{$name}, $dedup.'');
 		push($tsv{$name}, $multimapped.'');
 		push($tsv{$name}, $total.'');
@@ -277,7 +277,7 @@ sub searchAligned
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}else{
 			push($tsv{$name}, $multimapped);
-			push($tsv{$name}, ((int($paired[0])/2) - int($multimapped))."");
+			push($tsv{$name}, ((int($paired[0])/2 - int($singleton[0])) - int($multimapped))."");
 		}
 	}
 }
@@ -306,7 +306,7 @@ sub alteredAligned
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}else{
 			push($tsv{$name}, $multimapped);
-			push($tsv{$name}, ((int($paired[0])/2) - int($multimapped))."");
+			push($tsv{$name}, ((int($paired[0])/2 - int($singleton[0])) - int($multimapped))."");
 		}
 	}
 }
