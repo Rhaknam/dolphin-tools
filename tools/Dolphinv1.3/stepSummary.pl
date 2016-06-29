@@ -233,7 +233,7 @@ sub dedupReadsAligned
 	print $contents;
 	my @files = split(/[\n]+/, $contents);
 	push(@headers, "Duplicated Reads $type");
-	push(@headers, "Multi-mapped Reads Aligned $type");
+	push(@headers, "Multimapped Reads Aligned $type");
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
@@ -260,7 +260,7 @@ sub searchAligned
 	chomp(my $contents = `ls $directory/$filetype`);
 	print $contents;
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Multi-mapped Reads Aligned $type");
+	push(@headers, "Multimapped Reads Aligned $type");
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
@@ -289,7 +289,7 @@ sub alteredAligned
 	my ($filetype) = $_[2];
 	chomp(my $contents = `ls $directory/$filetype`);
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Multi-mapped Reads Aligned $type");
+	push(@headers, "Multimapped Reads Aligned $type");
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
