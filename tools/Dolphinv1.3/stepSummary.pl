@@ -206,7 +206,7 @@ sub checkAlignmentType
 	}elsif(grep( /^$outdir\/dedup$deduptype$/, @dirs )){
 		dedupReadsAligned("$outdir/dedup$deduptype", $type);
 	}elsif(grep( /^$outdir\/merge$type$/, @dirs )){
-		searchAligned("$outdir", $type, "*.bam");
+		searchAligned("$outdir/merge$type", $type, "*.bam");
 	}elsif(grep( /^$outdir\/$type$/, @dirs )){
 		if ($type eq "tophat"){
 			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam");
@@ -218,7 +218,7 @@ sub checkAlignmentType
 				alteredAligned("$outdir/$type", $type, "*/*transcript.bam");
 			}
 		}else{
-			searchAligned("$outdir", $type, "*.bam");
+			searchAligned("$outdir/$type", $type, "*.bam");
 		}
 	}elsif($type eq "chip"){
 		searchAligned("$outdir/seqmapping/chip", $type, "*.bam");
