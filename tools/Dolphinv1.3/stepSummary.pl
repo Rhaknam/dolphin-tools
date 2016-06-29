@@ -288,6 +288,7 @@ sub alteredAligned
 	my ($type) = $_[1];
 	my ($filetype) = $_[2];
 	chomp(my $contents = `ls $directory/$filetype`);
+	print $contents;
 	my @files = split(/[\n]+/, $contents);
 	push(@headers, "Multimapped Reads Aligned $type");
 	push(@headers, "Unique Reads Aligned $type");
