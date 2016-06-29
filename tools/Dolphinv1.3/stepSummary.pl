@@ -232,18 +232,22 @@ sub dedupReadsAligned
 	chomp(my $contents = `ls $directory/*PCR_duplicates`);
 	print $contents;
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Duplicated Reads $type", "Reads Aligned $type");
+	push(@headers, "Duplicated Reads $type");
+	push(@headers, "Multi-mapped Reads Aligned $type");
+	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
 		my $name = $namelist[0];
 		my @namelist2 = split(/_PCR_duplicates/, $name);
 		$name = $namelist2[0];
+		chomp(my $multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
 		chomp(my $aligned = `cat $file | grep -A 1 \"LIB\" | grep -v \"LIB\"`);
 		my @values = split("\t", $aligned);
-		my $dedup = $values[5];
-		my $total = int($values[2]) - int($dedup);
-		push($tsv{$name}, int($dedup).'');
+		my $dedup = int($values[5]);
+		my $total = int($values[2]) - $dedup - int($multimapped);
+		push($tsv{$name}, $dedup.'');
+		push($tsv{$name}, $multimapped.'');
 		push($tsv{$name}, $total.'');
 	}
 }
@@ -256,7 +260,8 @@ sub searchAligned
 	chomp(my $contents = `ls $directory/$filetype`);
 	print $contents;
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Reads Aligned $type");
+	push(@headers, "Multi-mapped Reads Aligned $type");
+	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
@@ -265,11 +270,14 @@ sub searchAligned
 		my @aligned_split = split(/[\n]+/, $aligned);
 		my @paired = split(/[\s]+/, $aligned_split[9]);
 		my @singleton = split(/[\s]+/, $aligned_split[10]);
+		chomp(my $multimapped = `$samtools view -f 256 $file | awk '{print \$1}' | sort -u | wc -l`);
 		if (int($paired[0])/2 == 0) {
 			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
-			push($tsv{$name}, $aligned);
+			push($tsv{$name}, $multimapped);
+			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}else{
-			push($tsv{$name}, (int($paired[0])/2)."");
+			push($tsv{$name}, $multimapped);
+			push($tsv{$name}, ((int($paired[0])/2) - int($multimapped))."");
 		}
 	}
 }
@@ -281,7 +289,8 @@ sub alteredAligned
 	my ($filetype) = $_[2];
 	chomp(my $contents = `ls $directory/$filetype`);
 	my @files = split(/[\n]+/, $contents);
-	push(@headers, "Reads Aligned $type");
+	push(@headers, "Multi-mapped Reads Aligned $type");
+	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
@@ -290,11 +299,14 @@ sub alteredAligned
 		my @aligned_split = split(/[\n]+/, $aligned);
 		my @paired = split(/[\s]+/, $aligned_split[9]);
 		my @singleton = split(/[\s]+/, $aligned_split[10]);
+		chomp(my $multimapped = `$samtools view -f 256 $file | awk '{print \$1}' | sort -u | wc -l`);
 		if (int($paired[0])/2 == 0) {
 			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
-			push($tsv{$name}, $aligned);
+			push($tsv{$name}, $multimapped);
+			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}else{
-			push($tsv{$name}, (int($paired[0])/2)."");
+			push($tsv{$name}, $multimapped);
+			push($tsv{$name}, ((int($paired[0])/2) - int($multimapped))."");
 		}
 	}
 }
