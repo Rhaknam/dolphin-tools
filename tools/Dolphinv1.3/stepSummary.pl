@@ -265,14 +265,9 @@ sub searchAligned
 		my @aligned_split = split(/[\n]+/, $aligned);
 		my @paired = split(/[\s]+/, $aligned_split[9]);
 		my @singleton = split(/[\s]+/, $aligned_split[10]);
-		my @singleend = split(/[\s]+/, $aligned_split[4]);
 		if (int($paired[0])/2 == 0) {
-			if (int($singleend[0]) == 0){
-				chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
-				push($tsv{$name}, $aligned);
-			}else{
-				push($tsv{$name}, (int($singleend[0]))."");
-			}
+			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+			push($tsv{$name}, $aligned);
 		}else{
 			push($tsv{$name}, (int($paired[0])/2)."");
 		}
@@ -295,14 +290,9 @@ sub alteredAligned
 		my @aligned_split = split(/[\n]+/, $aligned);
 		my @paired = split(/[\s]+/, $aligned_split[9]);
 		my @singleton = split(/[\s]+/, $aligned_split[10]);
-		my @singleend = split(/[\s]+/, $aligned_split[4]);
 		if (int($paired[0])/2 == 0) {
-			if (int($singleend[0]) == 0){
-				chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
-				push($tsv{$name}, $aligned);
-			}else{
-				push($tsv{$name}, (int($singleend[0]))."");
-			}
+			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+			push($tsv{$name}, $aligned);
 		}else{
 			push($tsv{$name}, (int($paired[0])/2)."");
 		}
