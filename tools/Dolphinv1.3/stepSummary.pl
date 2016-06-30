@@ -248,7 +248,7 @@ sub dedupReadsAligned
 			print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep -A 1 'Aligned pairs:' | awk 'NR % 3 == 2 {sum+=\$3} END {print sum}'" + "\n";
 			chomp($multimapped = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep -A 1 'Aligned pairs:' | awk 'NR % 3 == 2 {sum+=\$3} END {print sum}'`)
 		}elsif($type eq "chip"){
-			print "cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'" + "\n";
+			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'" + "\n";
 			chomp($multimapped = `cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'`);
 		}else{
 			print "$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l" + "\n";
@@ -295,10 +295,10 @@ sub searchAligned
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}elsif($type eq "chip"){
-			print "cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$5} END {print sum}'" + "\n";
-			chomp($aligned = `cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$5} END {print sum}'`);
-			print "cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'" + "\n";
-			chomp($multimapped = `cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'`);
+			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$5} END {print sum}'" + "\n";
+			chomp($aligned = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$5} END {print sum}'`);
+			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'" + "\n";
+			chomp($multimapped = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'`);
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, $aligned);
 		}else{
@@ -359,10 +359,10 @@ sub alteredAligned
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}elsif($type eq "chip"){
-			print "cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$5} END {print sum}'" + "\n";
-			chomp($aligned = `cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$5} END {print sum}'`);
-			print "cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'" + "\n";
-			chomp($multimapped = `cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'`);
+			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$5} END {print sum}'" + "\n";
+			chomp($aligned = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$5} END {print sum}'`);
+			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'" + "\n";
+			chomp($multimapped = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'`);
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, $aligned);
 		}else{
