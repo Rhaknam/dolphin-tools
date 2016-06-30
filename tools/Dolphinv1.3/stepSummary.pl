@@ -236,12 +236,19 @@ sub dedupReadsAligned
 	push(@headers, "Multimapped Reads Aligned $type");
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
+		my $multimapped;
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
 		my $name = $namelist[0];
 		my @namelist2 = split(/_PCR_duplicates/, $name);
 		$name = $namelist2[0];
-		chomp(my $multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
+		if ($type eq 'rsem') {
+			print "awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt";
+			chomp($multimapped = `awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`)
+		}else{
+			print "$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l";
+			chomp($multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
+		}
 		chomp(my $aligned = `cat $file | grep -A 1 \"LIB\" | grep -v \"LIB\"`);
 		my @values = split("\t", $aligned);
 		my $dedup = int($values[5]) + int($values[4]);
@@ -263,21 +270,35 @@ sub searchAligned
 	push(@headers, "Multimapped Reads Aligned $type");
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
+		my $multimapped;
+		my $aligned;
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
 		my $name = $namelist[0];
-		chomp(my $aligned = `$samtools flagstat $file`);
-		my @aligned_split = split(/[\n]+/, $aligned);
-		my @paired = split(/[\s]+/, $aligned_split[9]);
-		my @singleton = split(/[\s]+/, $aligned_split[10]);
-		chomp(my $multimapped = `$samtools view -f 256 $file | awk '{print \$1}' | sort -u | wc -l`);
-		if (int($paired[0])/2 == 0) {
-			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+		if ($type eq 'rsem') {
+			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt";
+			chomp($aligned = `awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`);
+			print "awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt";
+			chomp($multimapped = `awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`);
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}else{
-			push($tsv{$name}, $multimapped);
-			push($tsv{$name}, ((int($paired[0])/2 - int($singleton[0])) - int($multimapped))."");
+			print "$samtools flagstat $file";
+			chomp($aligned = `$samtools flagstat $file`);
+			my @aligned_split = split(/[\n]+/, $aligned);
+			my @paired = split(/[\s]+/, $aligned_split[9]);
+			my @singleton = split(/[\s]+/, $aligned_split[10]);
+			print "$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l";
+			chomp($multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
+			if (int($paired[0])/2 == 0) {
+				print "$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l";
+				chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+				push($tsv{$name}, $multimapped);
+				push($tsv{$name}, (int($aligned) - int($multimapped))."");
+			}else{
+				push($tsv{$name}, $multimapped);
+				push($tsv{$name}, ((int($paired[0])/2 - int($singleton[0])) - int($multimapped))."");
+			}
 		}
 	}
 }
@@ -293,21 +314,34 @@ sub alteredAligned
 	push(@headers, "Multimapped Reads Aligned $type");
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
+		my $multimapped;
+		my $aligned;
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
 		my $name = $namelist[2];
-		chomp(my $aligned = `$samtools flagstat $file`);
-		my @aligned_split = split(/[\n]+/, $aligned);
-		my @paired = split(/[\s]+/, $aligned_split[9]);
-		my @singleton = split(/[\s]+/, $aligned_split[10]);
-		chomp(my $multimapped = `$samtools view -f 256 $file | awk '{print \$1}' | sort -u | wc -l`);
-		if (int($paired[0])/2 == 0) {
-			chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+		if ($type eq 'rsem') {
+			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt";
+			chomp($aligned = `awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`);
+			print "awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt";
+			chomp($multimapped = `awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`);
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}else{
-			push($tsv{$name}, $multimapped);
-			push($tsv{$name}, ((int($paired[0])/2 - int($singleton[0])) - int($multimapped))."");
+			chomp($aligned = `$samtools flagstat $file`);
+			my @aligned_split = split(/[\n]+/, $aligned);
+			my @paired = split(/[\s]+/, $aligned_split[9]);
+			my @singleton = split(/[\s]+/, $aligned_split[10]);
+			print "$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l";
+			chomp($multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
+			if (int($paired[0])/2 == 0) {
+				print "$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l";
+				chomp(my $aligned = `$samtools view -F 4 $file | awk '{print \$1}' | sort -u | wc -l`);
+				push($tsv{$name}, $multimapped);
+				push($tsv{$name}, (int($aligned) - int($multimapped))."");
+			}else{
+				push($tsv{$name}, $multimapped);
+				push($tsv{$name}, ((int($paired[0])/2 - int($singleton[0])) - int($multimapped))."");
+			}
 		}
 	}
 }
