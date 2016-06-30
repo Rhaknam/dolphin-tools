@@ -288,8 +288,15 @@ sub searchAligned
 		}elsif($type eq "tophat"){
 			print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Aligned pairs:' | awk '{sum+=\$3} END {print sum}' \n";
 			chomp($aligned = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Aligned pairs:' | awk '{sum+=\$3} END {print sum}'`);
-			print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep -A 1 'Aligned pairs:' | awk 'NR % 3 == 2 {sum+=\$3} END {print sum}' \n";
-			chomp($multimapped = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep -A 1 'Aligned pairs:' | awk 'NR % 3 == 2 {sum+=\$3} END {print sum}'`);
+			if ($aligned eq "") {
+				print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Mapped' | awk '{sum+=\$3} END {print sum}' \n";
+				chomp($aligned = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Mapped' | awk '{sum+=\$3} END {print sum}'`);
+				print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'multiple alignments' | awk '{sum+=\$3} END {print sum}' \n";
+				chomp($multimapped = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'multiple alignments' | awk '{sum+=\$3} END {print sum}'`);
+			}else{
+				print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep -A 1 'Aligned pairs:' | awk 'NR % 3 == 2 {sum+=\$3} END {print sum}' \n";
+				chomp($multimapped = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep -A 1 'Aligned pairs:' | awk 'NR % 3 == 2 {sum+=\$3} END {print sum}'`);
+			}
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}elsif($type eq "chip"){
