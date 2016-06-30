@@ -296,8 +296,7 @@ sub searchAligned
 				foreach my $unmerge_dir (@unmerged_dirs){
 					chomp($unmerge_dir);
 					if ($unmerge_dir =~ /$name\_[\d][\d]$/) {
-						print "got there \n";
-						$merged_command += " && " if ($merged_command ne "");
+						$merged_command += " && " if ($merged_command !~ "");
 						$merged_command += "cat $unmerge_dir/align_summary.txt";
 					}
 				}
