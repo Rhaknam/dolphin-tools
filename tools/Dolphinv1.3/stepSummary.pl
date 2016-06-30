@@ -294,7 +294,8 @@ sub searchAligned
 				chomp(my $unmerged = `ls -d $outdir/tophat/pipe.tophat.$name*`);
 				my @unmerged_dirs = split(/[\n]+/, $unmerged);
 				foreach my $unmerge_dir (@unmerged_dirs){
-					if (/$outdir\/tophat\/pipe\.tophat\.$name\_[0-9][0-9]$/ =~ $unmerge_dir) {
+					print($unmerge_dir);
+					if (/$outdir\/tophat\/pipe\.tophat\.$name\_[0-9][0-9]\// =~ $unmerge_dir) {
 						$merged_command+=" && " if ($merged_command ne "");
 						$merged_command+= "cat $unmerge_dir/align_summary.txt";
 					}
@@ -315,13 +316,13 @@ sub searchAligned
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}elsif($type eq "chip"){
-			my $chip_parse = "cat $outdir/seqmapping/chip/$name*.sum";
+			my $chip_parse = "cat $outdir/seqmapping/chip/$name.sum";
 			if ($merge eq "merge") {
 				my $merged_command = "";
 				chomp(my $unmerged = `ls -d $outdir/seqmapping/chip/$name*.sum`);
 				my @unmerged_dirs = split(/[\n]+/, $unmerged);
 				foreach my $unmerge_dir (@unmerged_dirs){
-					if (/$outdir\/seqmapping\/chip\/$name\_[0-9][0-9].sum$/ =~ $unmerge_dir) {
+					if (/$outdir\/seqmapping\/chip\/$name\_[0-9][0-9].sum\// =~ $unmerge_dir) {
 						$merged_command+=" && " if ($merged_command ne "");
 						$merged_command+= "cat $unmerge_dir";
 					}
