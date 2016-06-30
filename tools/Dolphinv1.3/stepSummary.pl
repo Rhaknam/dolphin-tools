@@ -295,7 +295,7 @@ sub searchAligned
 				my @unmerged_dirs = split(/[\n]+/, $unmerged);
 				foreach my $unmerge_dir (@unmerged_dirs){
 					print($unmerge_dir);
-					if (/$outdir\/tophat\/pipe\.tophat\.$name\_[0-9][0-9]\// =~ $unmerge_dir) {
+					if (/$outdir\/tophat\/pipe\.tophat\.$name\_\d\d\// =~ $unmerge_dir) {
 						$merged_command+=" && " if ($merged_command ne "");
 						$merged_command+= "cat $unmerge_dir/align_summary.txt";
 					}
@@ -322,7 +322,7 @@ sub searchAligned
 				chomp(my $unmerged = `ls -d $outdir/seqmapping/chip/$name*.sum`);
 				my @unmerged_dirs = split(/[\n]+/, $unmerged);
 				foreach my $unmerge_dir (@unmerged_dirs){
-					if (/$outdir\/seqmapping\/chip\/$name\_[0-9][0-9].sum\// =~ $unmerge_dir) {
+					if (/$outdir\/seqmapping\/chip\/$name\_\d\d.sum\// =~ $unmerge_dir) {
 						$merged_command+=" && " if ($merged_command ne "");
 						$merged_command+= "cat $unmerge_dir";
 					}
