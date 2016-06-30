@@ -294,8 +294,8 @@ sub searchAligned
 				chomp(my $unmerged = `ls -d $outdir/tophat/pipe.tophat.$name*`);
 				my @unmerged_dirs = split(/[\n]+/, $unmerged);
 				foreach my $unmerge_dir (@unmerged_dirs){
-					print($unmerge_dir);
-					if (/$outdir\/tophat\/pipe\.tophat\.$name\_\d\d\// =~ $unmerge_dir) {
+					print $unmerge_dir + "\n";
+					if (/$outdir\/tophat\/pipe\.tophat\.$name\_[\d][\d]\// =~ $unmerge_dir) {
 						$merged_command+=" && " if ($merged_command ne "");
 						$merged_command+= "cat $unmerge_dir/align_summary.txt";
 					}
