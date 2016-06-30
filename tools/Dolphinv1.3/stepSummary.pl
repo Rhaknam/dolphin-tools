@@ -296,8 +296,8 @@ sub searchAligned
 				foreach my $unmerge_dir (@unmerged_dirs){
 					chomp($unmerge_dir);
 					if ($unmerge_dir =~ /$name\_[\d][\d]$/) {
-						$merged_command .= " && " if ($merged_command ne "");
-						$merged_command .= "cat $unmerge_dir/align_summary.txt";
+						$merged_command .= "cat" if ($merged_command eq "");
+						$merged_command .= " $unmerge_dir/align_summary.txt";
 					}
 				}
 				$tophat_parse = $merged_command;
@@ -324,8 +324,8 @@ sub searchAligned
 				foreach my $unmerge_dir (@unmerged_dirs){
 					chomp($unmerge_dir);
 					if ($unmerge_dir =~ /$name\_[\d][\d].sum$/) {
-						$merged_command .= " && " if ($merged_command ne "");
-						$merged_command .= "cat $unmerge_dir";
+						$merged_command .= "cat" if ($merged_command eq "");
+						$merged_command .= " $unmerge_dir";
 					}
 				}
 				$chip_parse = $merged_command;
