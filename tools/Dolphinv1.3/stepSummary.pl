@@ -80,8 +80,6 @@ my $count_files = `ls $outdir/counts/*.summary.tsv 2>/dev/null`;
 push(@headers, 'Sample');
 push(@headers, 'Total Reads');
 
-print $count_files+"\n";
-
 if ( $count_files ne ""){
 	my @files = split(/[\n\r\s\t,]+/, $count_files);
 	my $filestr="";
