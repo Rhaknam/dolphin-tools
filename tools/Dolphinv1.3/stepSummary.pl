@@ -294,10 +294,10 @@ sub searchAligned
 				chomp(my $unmerged = `ls -d $outdir/tophat/pipe.tophat.$name*`);
 				my @unmerged_dirs = split(/[\n]+/, $unmerged);
 				foreach my $unmerge_dir (@unmerged_dirs){
-					print "$unmerge_dir \n";
+					chomp($unmerge_dir);
 					if ($unmerge_dir =~ /$name\_[\d][\d]$/) {
-						$merged_command+=" && " if ($merged_command ne "");
-						$merged_command+= "cat $unmerge_dir/align_summary.txt";
+						$merged_command += " && " if ($merged_command ne "");
+						$merged_command += "cat $unmerge_dir/align_summary.txt";
 					}
 				}
 				$tophat_parse = $merged_command;
@@ -322,9 +322,10 @@ sub searchAligned
 				chomp(my $unmerged = `ls -d $outdir/seqmapping/chip/$name*.sum`);
 				my @unmerged_dirs = split(/[\n]+/, $unmerged);
 				foreach my $unmerge_dir (@unmerged_dirs){
+					chomp($unmerge_dir);
 					if ($unmerge_dir =~ /$name\_[\d][\d].sum$/) {
-						$merged_command+=" && " if ($merged_command ne "");
-						$merged_command+= "cat $unmerge_dir";
+						$merged_command += " && " if ($merged_command ne "");
+						$merged_command += "cat $unmerge_dir";
 					}
 				}
 				$chip_parse = $merged_command;
