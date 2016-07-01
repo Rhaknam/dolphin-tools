@@ -20,7 +20,8 @@ use List::Util qw[min max];
 use strict;
 use File::Basename;
 use Getopt::Long;
-use Pod::Usage; 
+use Pod::Usage;
+use Data::Dumper;
 
 #################### VARIABLES ######################
 my $outdir           = "";
@@ -119,12 +120,6 @@ if ($dir_test !~/No such file or directory/){
 	die "Error 256: cannot find bam file directory:";
 }
 
-my $peaks = "";
-
-if ($merge == "yes" && $comparePeaks == "yes") {
-	$peaks = "$multiCmd -i $outdir/macs/*peaks.bed > $inputdir/all_peaks.bed &&";
-}
-
 my $original_outdir = $outdir;
 $outdir   = "$outdir/haplotypecaller";
 `mkdir -p $outdir`;
@@ -138,8 +133,30 @@ die "Error 64: please check the if you defined the parameters right:" unless ($c
 print $com;
 my @files = split(/[\n\r\s\t,]+/, $com);
 
+if ($merge eq "yes"){
+	if ($comparePeaks eq "yes") {
+		my $peaksfilecom = `ls $original_outdir/macs/*peaks.bed`;
+		my @peaksfiles = split(/[\n\r\s\t,]+/, $peaksfilecom);
+		my $peaksstr = "$multiCmd -i " . join(" ", @peaksfiles) . " > $outdir/all_peaks.bed";
+		print $peaksstr;
+		print "\@\@\@test\@\@\@";
+		my $peakscom=`$peaksstr`;
+		die "Error 64: please check the if you defined the parameters right:" unless ($peakscom !~/No such file or directory/);
+	}
+	my $mergestr = "$samtools merge $outdir/mergeall.bam " . join(' ', @files) . " -f";
+	print $mergestr;
+	print "\@\@\@test\@\@\@";
+	my $mergecom = `$mergestr`;
+	print $mergecom;
+	die "Error 64: please check the if you defined the parameters right:" unless ($mergecom !~/No such file or directory/);
+	@files = ("$outdir/mergeall.bam");
+}
+
+print Dumper(@files);
+
 my @vcf_input = ("");
 my @vcf_files = ("");
+my $peaks = "";
 
 foreach my $file (@files)
 {
@@ -150,9 +167,9 @@ foreach my $file (@files)
 	@vcf_input = ("");
 	@vcf_files = ($input_file);
 	
-	if ($comparePeaks == "yes") {
-		if ($merge == "yes") {
-			$peaks.= "$bedCmd intersect -abam $file -b $inputdir/all_peaks.bed > $outdir/peaks_$str_file &&";
+	if ($comparePeaks eq "yes") {
+		if ($merge eq "yes") {
+			$peaks = "$bedCmd intersect -abam $file -b $outdir/all_peaks.bed > $outdir/peaks_$str_file &&";
 			$str_file = "peaks_$str_file";
 			$input_file = "$outdir/$str_file";
 		}else{
@@ -165,61 +182,61 @@ foreach my $file (@files)
 	}
 	
 	############	Start SNP File Type Calls
-	if ($motifs == "yes") {
-		if ($common == "yes" ) {
+	if ($motifs eq "yes") {
+		if ($common eq "yes" ) {
 			if ($enhancer == "yes") {
 				intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_enhancer_commonSNPs.bed", "motif_common_enhancer", $outdir, $str_file);
 			}
-			if ($promoter == "yes") {
+			if ($promoter eq "yes") {
 				intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_promoter_commonSNPs.bed", "motif_common_promoter", $outdir, $str_file);
 			}
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_commonSNPs.bed", "motif_common", $outdir, $str_file);
 		}
 		
-		if($clinical == "yes"){
-			if ($enhancer == "yes") {
+		if($clinical eq "yes"){
+			if ($enhancer eq "yes") {
 				intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_enhancer_clincial_commonSNPs.bed", "motif_clinical_enhancer", $outdir, $str_file);
 			}
-			if ($promoter == "yes") {
+			if ($promoter eq "yes") {
 				intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_promoter_clincial_commonSNPs.bed", "motif_clinical_promoter", $outdir, $str_file);
 			}
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_clinical_commonSNPs.bed", "motif_clinical", $outdir, $str_file);
 		}
 		
-		if ($enhancer == "yes") {
+		if ($enhancer eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_enhancer_regions.bed", "motif_enhancer", $outdir, $str_file);
 		}
-		if ($promoter == "yes") {
+		if ($promoter eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_promoter_regions.bed", "motif_promoter", $outdir, $str_file);
 		}
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motifs_human_merged_atac_peaks.bed", "motif", $outdir, $str_file);
 	}
 	
-	if($common == "yes"){
-		if ($enhancer == "yes") {
+	if($common eq "yes"){
+		if ($enhancer eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "enhancer_commonSNPs.bed", "common_enhancer", $outdir, $str_file);
 		}
-		if ($promoter == "yes") {
+		if ($promoter eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "promoter_commonSNPs.bed", "common_promoter", $outdir, $str_file);
 		}
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "commonSNPs.bed", "common", $outdir, $str_file);
 	}
 	
-	if($clinical == "yes"){
-		if ($enhancer == "yes") {
+	if($clinical eq "yes"){
+		if ($enhancer eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "enhancer_clinical_commonSNPs.bed", "clinical_enhancer", $outdir, $str_file);
 		}
-		if ($promoter == "yes") {
+		if ($promoter eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "promoter_clinical_commonSNPs.bed", "clinical_promoter", $outdir, $str_file);
 		}
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "clinical_commonSNPs.bed", "clinical", $outdir, $str_file);
 	}
 	
-	if ($enhancer == "yes") {
+	if ($enhancer eq "yes") {
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "enhancer_atac_peaks_human.bed", "enhancer", $outdir, $str_file);
 	}
 	
-	if ($promoter == "yes") {
+	if ($promoter eq "yes") {
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "promoter_atac_peaks_human.bed", "promoter", $outdir, $str_file);
 	}
 	
