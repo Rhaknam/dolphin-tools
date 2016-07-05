@@ -1,0 +1,151 @@
+#General Parameters
+@PERL             = perl
+@PYTHON           = python
+@JAVA             = java
+@SAMTOOLS         = samtools
+@BIN              = /home/travis/build/dolphin-bin
+@SAMTOOLSFLAG     = "@BIN/samtools-1.2/samtools"
+@DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
+@GDB              = /export/genome_data/@GENOME/@VERSION
+@GCOMMONDB        = @GDB/commondb
+@JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -o @OUTDIR"
+@PUBDIR           = /export/pub 
+
+#STEPCHECK INPUT FILES
+@RUNCHECK         = @PERL @DOLPHIN/stepCheck.pl
+@DBCOMMCMD        = "@PYTHON @DOLPHIN/dbcomm.py"
+
+#RUN BACKUPS3
+@RUNBACKUPS3      = @PYTHON @DOLPHIN/stepBackupS3.py
+
+#RUN GET_TOTAL_READ_COUNTS
+@RUNGETTOTALREADS = @PYTHON @DOLPHIN/stepGetTotalReads.py
+
+#StepMapping
+@DEFBOWTIE2PARAM  = "-p 2 -N 1"
+@DEFDESCRIPTION   = "multiple mappers upto 1 mismatch"
+@RUNSEQMAPPING    = @PERL @DOLPHIN/stepMapping.pl
+@BOWTIE2CMD       = @BIN/bowtie2
+@ADVPARAMS        = "-N 1"
+
+#StepBarcode Separation
+@RUNBARCODE         = @PERL @DOLPHIN/stepBarcode.pl
+#@PAIREDBSPLITTERCMD = "@JAVA -jar /project/umw_garberlab/bin/fqsplitter.jar"
+@PAIREDBSPLITTERCMD = "@BIN/novobarcode"
+
+#StepAdapter Remover
+@RUNADAPTER         = @PERL @DOLPHIN/stepAdapter.pl
+@MATICCMD           = "@JAVA -jar @BIN/trimmomatic-0.32.jar"
+
+#Step Quality Filtering
+@RUNQUALITY         = @PERL @DOLPHIN/stepQuality.pl
+
+#StepTrim 
+@RUNTRIM            = @PERL @DOLPHIN/stepTrimmer.pl
+@TRIMMERCMD         = @BIN/fastx_trimmer
+
+#StepCounts
+@RUNCOUNTS          = @PERL @DOLPHIN/stepCounts.pl
+@MAKEBED            = "@PERL @DOLPHIN/makeBed.pl"
+@BEDTOOLSCMD        = "@BIN/bedtools multicov"
+@INDEXCMD           = @BIN/bowtie2-build
+
+#StepDESeq2
+@RUNDESEQ2          =  @PERL @DOLPHIN/stepDESeq2.pl
+@RSCRIPT            = "Rscript --no-save --no-restore --verbose"
+
+#StepMakeReport 
+@RUNMAKEREPORT      = @PERL @DOLPHIN/stepMakeReport.pl
+
+#StepFastQC
+@RUNFASTQC          = @DOLPHIN/stepFastQC.pl
+@FASTQCPROG         = @BIN/fastqc_0.10.1/fastqc
+@RUNFASTQCMERGE     = @DOLPHIN/stepAfterFastQC.pl
+
+#StepRSEM
+@RUNRSEM            = @PERL @DOLPHIN/stepRSEM.pl
+@RSEMCMD            = "@PERL @BIN/RSEM-1.2.29/rsem-calculate-expression"
+@CONVERTRSEM        = "@PERL @BIN/RSEM-1.2.29/convert-sam-for-rsem"
+@BOWTIEPATH         = @BIN
+@RSEMREF            = @GDB/rsem_ref
+
+#StepRSEMCount
+@RUNRSEMCOUNT       = @PERL @DOLPHIN/stepRSEMcount.pl
+
+#StepTophat2
+@RUNTOPHAT2         = @DOLPHIN/stepTophat2.pl
+@BOWTIE2INDEX       = @GDB/@VERSION
+@GTF                = @GDB/ucsc.gtf#Required
+@TOPHAT2CMD         = @BIN/tophat2_2.0.12/tophat2
+
+#stepSplit Fastq
+@RUNSPLIT           = @DOLPHIN/stepSplit.pl
+
+#stepMergeBAM
+@RUNMERGEBAM        = @DOLPHIN/stepMergeBAM.pl
+
+#Step MACS
+@RUNMACS            = @PERL @DOLPHIN/stepMACS.pl
+@MACSCMD            = "macs2 callpeak --tsize=@TSIZE --bw=@BWIDTH -g @GSIZE"
+
+#StepIGVTDF
+@RUNIGVTDF          = @PERL @DOLPHIN/stepIGVTDF.pl
+@GENOMEFASTA        = @GDB/@VERSION.fa #Required
+@IGVTOOLS           = @BIN/igvtools.sh
+
+#Step Convert BW
+@GENOMESIZE         = @GDB/@VERSION.chrom.sizes
+@RUNBAM2BW          = @PERL @DOLPHIN/stepBAM2BW.pl
+@RUNCOVERAGE        = "@BIN/genomeCoverageBed" 
+@WIGTOBIGWIG        = @BIN/wigToBigWig
+
+#Step picard 
+@RUNPICARD          = @DOLPHIN/stepPicard.pl
+@RUNMERGEPICARD     = @DOLPHIN/stepMergePicard.pl
+@MERGEPDFCMD        = "@JAVA -jar @BIN/pdfbox-app-2.0.0-RC2.jar PDFMerger"
+@PICARDCMD          = "@JAVA -jar @BIN/picard-tools-1.131/picard.jar" 
+@REFFLAT            = @GDB/ref_flat
+
+#Step PCRDups
+@PCRDUPS            = @DOLPHIN/stepPCRDups.pl
+
+#Step bamToFastq
+@RUNBAMTOFASTQ      = @DOLPHIN/stepBamToFastq.pl
+@BTOOLSBAMTOFASTQ   = @BIN/bamToFastq
+
+#Step RSeQC
+@RUNRSEQC           = @DOLPHIN/stepRSEQC.pl
+@RUNMERGERSEQC      = @DOLPHIN/stepMergeRSeQC.pl
+@RSEQCCMD           = read_distribution.py 
+@BED12FILE          = @GDB/@VERSION.bed
+
+#RunAggregation
+@RUNAGGREGATION     = @PERL @DOLPHIN/stepAGG.pl
+@REFACT             = @GDB/refACT.tab
+@BTOOLSGENCOV       = @RUNCOVERAGE
+@INTOPDF            = "R --file=@BIN/ACT/intopdf.R"
+@ACT                = "@PYTHON @BIN/ACT/ACT.py --radius=5000 --nbins=50 --mbins=50 --region"
+
+#BISULPHITE PIPELINE
+@RUNBSMAP           = @PERL @DOLPHIN/stepBSMap.pl
+@BSMAPCMD           = @BIN/bsmap
+@RUNMCALL           = @PERL @DOLPHIN/stepMCall.pl
+@RUNMETHYLKIT       = @PERL @DOLPHIN/stepMethylKit.pl
+@RUNDIFFMETH        = @PERL @DOLPHIN/stepDiffMeth.pl
+
+#Step Haplotype
+@RUNHAPLOTYPE       = @PERL @DOLPHIN/stepHaplotype.pl
+@HAPLOTYPECMD       = "@JAVA -jar @BIN/GenomeAnalysisTK.jar"
+@HAPLOBED           = @GDB/bed
+@BEDTOOLS           = @BIN/bedtools
+@MULTIINTER         = @BIN/multiIntersectBed
+
+#RunAlignmentCount Step
+@RUNALIGNMENTCOUNT  = @PERL @DOLPHIN/stepAlignmentCount.pl
+
+#RunSummary Step
+@RUNSUMMARY         = @PERL @DOLPHIN/stepSummary.pl
+
+#RunCleaning Step
+@RUNCLEAN           = @PERL @DOLPHIN/stepClean.pl
+
