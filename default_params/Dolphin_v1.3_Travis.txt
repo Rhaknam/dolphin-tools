@@ -6,7 +6,7 @@
 @BIN              = /home/travis/build/dolphin-bin
 @SAMTOOLSFLAG     = "@BIN/samtools-1.2/samtools"
 @DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
-@GDB              = /home/travis/build/genome_data/@GENOME/@VERSION
+@GDB              = /home/travis/build/dolphin-genome-data/@GENOME/@VERSION
 @GCOMMONDB        = @GDB/commondb
 @JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -o @OUTDIR"
 @PUBDIR           = /export/pub 
