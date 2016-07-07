@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, re, string, sys, commands
+import ConfigParser, os, re, string, sys, commands
 import warnings
 import json
 
@@ -9,6 +9,8 @@ from boto3.s3.transfer import S3Transfer
 from botocore.client import Config
 from sys import argv, exit, stderr
 from optparse import OptionParser
+from binascii import hexlify, unhexlify
+from simplecrypt import encrypt, decrypt
 
 sys.path.insert(0, sys.path[0]+"/../../src")
 from config import *
@@ -30,9 +32,11 @@ class stepBackup:
   
   def uploadFile(self, amazon, amazon_bucket, fastq_dir, filename ):
     try:
+       passgrab = ConfigParser.ConfigParser()
+       passgrab.readfp(open('config/.salt'))
        s3 = boto3.resource('s3', 'us-east-1',
-       aws_access_key_id=amazon['aws_access_key_id'],
-       aws_secret_access_key=amazon['aws_secret_access_key'],
+       aws_access_key_id=decrypt(passgrab.get('Dolphin', 'AMAZON_SALT'), unhexlify(amazon['aws_access_key_id'])),
+       aws_secret_access_key=decrypt(passgrab.get('Dolphin', 'AMAZON_SALT'), unhexlify(amazon['aws_secret_access_key'])),
        config=Config(signature_version='s3v4'))
 
        p = amazon_bucket.split("/")
@@ -179,7 +183,7 @@ class stepBackup:
       else:
           filename= libname+'.fastq.gz'
           count=self.getValfromFile(backup_dir+'/'+libname+'.fastq.gz.count')
-          md5sum=self.getValfromFile(backup_dir+'/'+libname+'.fastq.gz.md5sum')
+          md5sum=self.getValfromFile(backup_dir+'/'+libname+'.fastq.gz.md5sum').split(' ')[0]
       sample_id=self.getFastqFileId(sample)
       
       if (sample_id>0):
