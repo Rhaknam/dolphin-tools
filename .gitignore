@@ -3,3 +3,4 @@ src/*.pyc
 *.pyc
 src/PCR_duplicates
 docs/_*
+default_params/.salt

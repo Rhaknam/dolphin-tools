@@ -35,8 +35,8 @@ class stepBackup:
        passgrab = ConfigParser.ConfigParser()
        passgrab.readfp(open('config/.salt'))
        s3 = boto3.resource('s3', 'us-east-1',
-       aws_access_key_id=decrypt(passgrab.get('Dolphin', 'AMAZON_SALT'), unhexlify(amazon['aws_access_key_id'])),
-       aws_secret_access_key=decrypt(passgrab.get('Dolphin', 'AMAZON_SALT'), unhexlify(amazon['aws_secret_access_key'])),
+       aws_access_key_id=decrypt(passgrab.get('Dolphin', 'AMAZON'), unhexlify(amazon['aws_access_key_id'])),
+       aws_secret_access_key=decrypt(passgrab.get('Dolphin', 'AMAZON'), unhexlify(amazon['aws_secret_access_key'])),
        config=Config(signature_version='s3v4'))
 
        p = amazon_bucket.split("/")
