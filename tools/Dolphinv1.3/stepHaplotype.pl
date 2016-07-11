@@ -45,6 +45,7 @@ my $motifs           = "";
 my $enhancer         = "";
 my $promoter         = "";
 my $comparePeaks     = "";
+my $custombed        = "";
 my $type             = "";
 my $jobsubmit        = "";
 my $servicename      = "";
@@ -78,6 +79,7 @@ GetOptions(
 	'enhancer=s'     => \$enhancer,
 	'promoter=s'     => \$promoter,
 	'comparePeaks=s' => \$comparePeaks,
+	'custombed=s'    => \$custombed,
 	'type=s'         => \$type,
 	'jobsubmit=s'    => \$jobsubmit,
 	'servicename=s'  => \$servicename,
@@ -139,7 +141,6 @@ if ($merge eq "yes"){
 		my @peaksfiles = split(/[\n\r\s\t,]+/, $peaksfilecom);
 		my $peaksstr = "$multiCmd -i " . join(" ", @peaksfiles) . " > $outdir/all_peaks.bed";
 		print $peaksstr;
-		print "\@\@\@test\@\@\@";
 		my $peakscom=`$peaksstr`;
 		die "Error 64: please check the if you defined the parameters right:" unless ($peakscom !~/No such file or directory/);
 	}
@@ -190,6 +191,9 @@ foreach my $file (@files)
 			if ($promoter eq "yes") {
 				intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_promoter_commonSNPs.bed", "motif_common_promoter", $outdir, $str_file);
 			}
+			if ($custombed ne "") {
+				customIntersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_commonSNPs.bed", "motif_common", $outdir, $str_file, $custombed);
+			}
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_commonSNPs.bed", "motif_common", $outdir, $str_file);
 		}
 		
@@ -200,6 +204,9 @@ foreach my $file (@files)
 			if ($promoter eq "yes") {
 				intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_promoter_clincial_commonSNPs.bed", "motif_clinical_promoter", $outdir, $str_file);
 			}
+			if ($custombed ne "") {
+				customIntersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_clinical_commonSNPs.bed", "motif_clinical", $outdir, $str_file, $custombed);
+			}
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_clinical_commonSNPs.bed", "motif_clinical", $outdir, $str_file);
 		}
 		
@@ -208,6 +215,9 @@ foreach my $file (@files)
 		}
 		if ($promoter eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motif_promoter_regions.bed", "motif_promoter", $outdir, $str_file);
+		}
+		if ($custombed ne "") {
+			customIntersectBed($peaks, $bedCmd, $input_file, $haplobed, "motifs_human_merged_atac_peaks.bed", "motif", $outdir, $str_file, $custombed);
 		}
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "motifs_human_merged_atac_peaks.bed", "motif", $outdir, $str_file);
 	}
@@ -219,6 +229,9 @@ foreach my $file (@files)
 		if ($promoter eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "promoter_commonSNPs.bed", "common_promoter", $outdir, $str_file);
 		}
+		if ($custombed ne "") {
+			customIntersectBed($peaks, $bedCmd, $input_file, $haplobed, "commonSNPs.bed", "common", $outdir, $str_file, $custombed);
+		}
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "commonSNPs.bed", "common", $outdir, $str_file);
 	}
 	
@@ -229,15 +242,20 @@ foreach my $file (@files)
 		if ($promoter eq "yes") {
 			intersectBed($peaks, $bedCmd, $input_file, $haplobed, "promoter_clinical_commonSNPs.bed", "clinical_promoter", $outdir, $str_file);
 		}
+		if ($custombed ne "") {
+			customIntersectBed($peaks, $bedCmd, $input_file, $haplobed, "clinical_commonSNPs.bed", "clinical", $outdir, $str_file, $custombed);
+		}
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "clinical_commonSNPs.bed", "clinical", $outdir, $str_file);
 	}
 	
 	if ($enhancer eq "yes") {
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "enhancer_atac_peaks_human.bed", "enhancer", $outdir, $str_file);
 	}
-	
 	if ($promoter eq "yes") {
 		intersectBed($peaks, $bedCmd, $input_file, $haplobed, "promoter_atac_peaks_human.bed", "promoter", $outdir, $str_file);
+	}
+	if ($custombed ne "") {
+		intersectBed($peaks, $bedCmd, $input_file, "", $custombed, "custombed", $outdir, $str_file);
 	}
 	
 	############	End SNP File Type Calls
@@ -288,11 +306,60 @@ sub checkFile
 	return 0;
 }
 
+#	intersectBed:
+#
+#	$peaks:
+#		If merge peaks was selected, this is the command that runs the peaks intersection
+#	$bedCmd:
+#		The bed command that is pulled from the config files
+#	$input_file
+#		The input bam file to intersect with the given bed file
+#	$haplobed
+#		Path to the bed file to intersect
+#	$bedfile
+#		The name of the bed file
+#	$bedprefix
+#		Prefix of the bed file
+#	$outdir
+#		The out directory of the intersected file
+#	$str_file
+#		String representation of the sample
 sub intersectBed
 {
 	my ($peaks, $bedCmd, $input_file, $haplobed, $bedfile, $bedprefix, $outdir, $str_file) = @_;
 	my $cmd = "";
 	$cmd.="$peaks $bedCmd intersect -abam $input_file -b $haplobed/$bedfile > $outdir/$bedprefix"."_"."$str_file &&";
+	push(@vcf_input, $cmd);
+	push(@vcf_files, "$outdir/$bedprefix"."_"."$str_file");
+}
+
+#	intersectBed:
+#
+#	$peaks:
+#		If merge peaks was selected, this is the command that runs the peaks intersection
+#	$bedCmd:
+#		The bed command that is pulled from the config files
+#	$input_file
+#		The input bam file to intersect with the given bed file
+#	$haplobed
+#		Path to the bed file to intersect
+#	$bedfile
+#		The name of the bed file
+#	$bedprefix
+#		Prefix of the bed file
+#	$outdir
+#		The out directory of the intersected file
+#	$str_file
+#		String representation of the sample
+#	$custombed
+#		Full path and filename of the custom bed file to intersect
+sub customIntersectBed
+{
+	my ($peaks, $bedCmd, $input_file, $haplobed, $bedfile, $bedprefix, $outdir, $str_file, $custombed) = @_;
+	my $cmd = "";
+	$cmd.="$peaks $bedCmd intersect -abam $input_file -b $haplobed/$bedfile > $outdir/$bedprefix"."_tmp_"."$str_file &&";
+	$cmd.="$bedCmd intersect -abam $outdir/"."_tmp_"."$str_file -b $custombed > $outdir/custom_"."$bedprefix"."_"."$str_file &&";
+	$cmd.="rm $outdir/"."_tmp_"."$str_file &&";
 	push(@vcf_input, $cmd);
 	push(@vcf_files, "$outdir/$bedprefix"."_"."$str_file");
 }
