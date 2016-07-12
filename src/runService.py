@@ -64,7 +64,6 @@ def main():
     except:
         print "OptionParser Error:for help use --help"
         sys.exit(2)
-
     INPUTPARAM  = options.inputparam
     PARAMFILE   = options.paramfile
     USERNAME    = options.username
