@@ -71,7 +71,6 @@ def main():
     f = funcs()
     config = getConfig(CONFIG)
     md5sum = stepMD5Sum(config['url'], f)
-    
     calcsum = md5sum.calcMD5Sum(FILE, OUTDIR)
     md5sum.runDBMD5SumUpdate(OUTDIR, FILE, calcsum)
     
