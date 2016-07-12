@@ -25,6 +25,7 @@ class stepMD5Sum:
         else:
             hashstr=calcHash(backup_dir + "/" + input.strip())
         print hashstr
+        return hashstr
     def runDBMD5SumUpdate(self, backup_dir, file_name, calcsum):
         data = urllib.urlencode({'func':'dbMd5sumUpdate', 'md5sum':str(calcsum), 'backup_dir':str(backup_dir), 'file_name':str(file_name)})
         ret = self.f.queryAPI(self.url, data)
@@ -32,10 +33,10 @@ class stepMD5Sum:
 def getValfromFile(filename):
     val=''
     if (os.path.isfile(filename)):
-        infile = open(filename)
+        infile = open(filename+".md5sum")
         val = infile.readlines()[0].rstrip()
     else:
-        sys.exit(84)
+        val = "none"
     return val
 
 def calcHash(inputfile):
@@ -44,7 +45,7 @@ def calcHash(inputfile):
     child = os.popen(command)
     jobout = child.read().rstrip()
     err = child.close()
-    hashstr = getValfromFile(inputfile+".md5sum").split(" ")[0]
+    hashstr = getValfromFile(inputfile).split(" ")[0]
     child = os.popen(command)
     print hashstr
     return hashstr
@@ -72,6 +73,10 @@ def main():
     config = getConfig(CONFIG)
     md5sum = stepMD5Sum(config['url'], f)
     calcsum = md5sum.calcMD5Sum(FILE, OUTDIR)
-    md5sum.runDBMD5SumUpdate(OUTDIR, FILE, calcsum)
+    print calcsum
+    if calcsum == "none,none" or calcsum == "none":
+        md5sum.runDBMD5SumUpdate(OUTDIR, FILE, "NULL")
+    else:    
+        md5sum.runDBMD5SumUpdate(OUTDIR, FILE, calcsum)
     
 main()
