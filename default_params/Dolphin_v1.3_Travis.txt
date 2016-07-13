@@ -9,7 +9,7 @@
 @GDB              = /home/travis/build/dolphin-genome-data/@GENOME/@VERSION
 @GCOMMONDB        = @GDB/commondb
 @JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -o @OUTDIR"
-@PUBDIR           = /export/pub 
+@PUBDIR           = /home/travis/build/pub
 
 #STEPCHECK INPUT FILES
 @RUNCHECK         = @PERL @DOLPHIN/stepCheck.pl
