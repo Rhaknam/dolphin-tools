@@ -6,7 +6,6 @@ import json
 import time
 import urllib,urllib2
 from optparse import OptionParser
-sys.path.insert(0, sys.path[0]+"/../../src")
 from config import *
 from funcs import *
 
@@ -68,12 +67,11 @@ def main():
     USERNAME                = options.username
     OUTDIR                  = options.outdir
     CONFIG                  = options.config
-    
+    print CONFIG
     f = funcs()
     config = getConfig(CONFIG)
     md5sum = stepMD5Sum(config['url'], f)
     calcsum = md5sum.calcMD5Sum(FILE, OUTDIR)
-    print calcsum
     if calcsum == "none,none" or calcsum == "none":
         md5sum.runDBMD5SumUpdate(OUTDIR, FILE, "NULL")
     else:    
