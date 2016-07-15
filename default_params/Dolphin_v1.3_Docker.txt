@@ -73,10 +73,20 @@
 @RUNRSEMCOUNT       = @PERL @DOLPHIN/stepRSEMcount.pl
 
 #StepTophat2
-@RUNTOPHAT2         = @DOLPHIN/stepTophat2.pl
+@RUNTOPHAT2         = @DOLPHIN/stepAlignment.pl
 @BOWTIE2INDEX       = @GDB/@VERSION
 @GTF                = @GDB/ucsc.gtf#Required
-@TOPHAT2CMD         = @BIN/tophat2_2.0.12/tophat2
+@COMMANDTOPHAT2     = @BIN/tophat2_2.0.12/tophat2
+
+#stepSTAR
+@RUNSTAR            = @DOLPHIN/stepAlignment.pl
+@STARINDEX          = @GDB/@VERSION
+@COMMANDSTAR        = @BIN/STAR
+
+#steHisat2
+@RUNHISAT2          = @DOLPHIN/stepAlignment.pl
+@HISAT2INDEX        = @GDB/@VERSION
+@COMMANDHISAT2      = @BIN/hisat2/hisat2
 
 #stepSplit Fastq
 @RUNSPLIT           = @DOLPHIN/stepSplit.pl
