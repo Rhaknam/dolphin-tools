@@ -85,7 +85,7 @@
 
 #stepSTAR
 @RUNSTAR            = @DOLPHIN/stepAlignment.pl
-@STARINDEX          = @GDB/@VERSION
+@STARINDEX          = @GDB
 @COMMANDSTAR        = @BIN/STAR
 
 #steHisat2

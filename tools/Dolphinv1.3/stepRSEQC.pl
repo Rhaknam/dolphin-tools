@@ -86,6 +86,18 @@ elsif(lc($type) eq "tophat")
    print $indir."\n";
    @files = <$indir/pipe*/*.sorted.bam>;
 }
+elsif (lc($type) eq "hisat2")
+{
+   my $indir   = "$outdir/hisat2";
+   print $indir."\n";
+   @files = <$indir/pipe*/*.sorted.bam>;
+}
+elsif (lc($type) eq "star")
+{
+   my $indir   = "$outdir/star";
+   print $indir."\n";
+   @files = <$indir/pipe*/*.sorted.bam>;
+}
 else
 {
    $indir   = "$outdir/$type";

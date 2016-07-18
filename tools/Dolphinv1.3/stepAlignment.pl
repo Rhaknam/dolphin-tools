@@ -47,7 +47,7 @@ my $command=$0." ".join(" ",@ARGV); ####command line copy
 GetOptions(
 	'aligner=s'      => \$aligner,
 	'outdir=s'       => \$outdir,
-	'commandcall=s'    => \$commandcall,
+	'commandcall=s'  => \$commandcall,
 	'dspaired=s'     => \$spaired,
 	'params=s'       => \$params,
 	'indexref=s'     => \$indexref,
@@ -160,13 +160,13 @@ foreach my $file (@files)
 	}else{
 		$file_input = "-U $str_files";
 	}
-	$com="mkdir -p $outdir/pipe.$aligner.$bname ";
+	$com="mkdir -p $outdir/pipe.$aligner.$bname " if (!(-s "$outdir/pipe.$aligner.$bname/$bname.bam"));
 	$com.=" && " if ($com!~/^$/);
-	$com.="$commandcall -p 4 $params -x $indexref $file_input -S $outdir/pipe.$aligner.$bname/$bname.sam " if (!(-s "$outdir/pipe.$aligner.$bname/$bname.bam"));
+	$com.="$commandcall -p 4 $params -x $indexref $file_input -S $outdir/pipe.$aligner.$bname/$bname.sam &> $outdir/pipe.$aligner.$bname/align_summary.txt " if (!(-s "$outdir/pipe.$aligner.$bname/$bname.bam"));
 	$com.=" && " if ($com!~/^$/);
-	$com.="$samtools view -bS $outdir/pipe.$aligner.$bname/$bname.sam > $outdir/pipe.$aligner.$bname/$bname.bam ";
+	$com.="$samtools view -bS $outdir/pipe.$aligner.$bname/$bname.sam > $outdir/pipe.$aligner.$bname/$bname.bam " if (!(-s "$outdir/pipe.$aligner.$bname/$bname.bam"));
 	$com.=" && " if ($com!~/^$/);
-	$com.="rm -rf $outdir/pipe.$aligner.$bname/$bname.sam ";
+	$com.="rm -rf $outdir/pipe.$aligner.$bname/$bname.sam " if (!(-s "$outdir/pipe.$aligner.$bname/$bname.bam"));
 	$com.=" && " if ($com!~/^$/);
 	$outfile="$bname.bam";
  ### STAR
