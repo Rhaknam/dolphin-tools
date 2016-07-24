@@ -209,7 +209,7 @@ sub checkAlignmentType
 		if ($type eq "tophat"){
 			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam", "norm");
 		}elsif ($type eq "rsem"){
-			my $genome_check = `ls $outdir/$type/*/*genome.bam`;
+			my $genome_check = `ls $outdir/$type/*/*genome.bam 2>&1`;
 			if ($genome_check !~ /No such file or directory/) {
 				alteredAligned("$outdir/$type", $type, "*/*genome.bam", "norm");
 			}else{
