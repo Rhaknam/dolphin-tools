@@ -125,7 +125,6 @@ foreach my $file (@files)
     $bname=$1;
     print $file."\n\n";
 	$pairtypecmd = "Surviving: 0";
-	`rm $outdir/$bname\_summary.log`;
     $com="$cmd SE -threads 1 $quality -trimlog $outdir/$bname.log $file $outdir/$bname.fastq $param &> $outdir/".$bname."_summary.log && cat $outdir/$bname\_summary.log";  
  }
  else
@@ -137,7 +136,6 @@ foreach my $file (@files)
     die "Error 64: please check the file:".$file2 unless (checkFile($file2));
     print "$file:$file2\n\n";
 	$pairtypecmd = "Both Surviving: 0";
-	`rm $outdir/$bname\_summary.log`;
     $com="$cmd PE -threads 1 $quality -trimlog $outdir/$bname.log $file $file2 $outdir/$bname.1.fastq $outdir/$bname.1.fastq.unpaired $outdir/$bname.2.fastq $outdir/$bname.1.fastq.unpaired $param &> $outdir/".$bname."_summary.log && cat $outdir/$bname\_summary.log";  
  }
  
