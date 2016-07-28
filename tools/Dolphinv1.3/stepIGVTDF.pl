@@ -104,7 +104,7 @@ elsif ($type eq "tophat")
 }
 else
 {
-  my $indir = "$outdir/$type";
+  my $indir = "$outdir/seqmapping/$type";
   @files = <$indir/*.bam>;
 }
 
