@@ -111,7 +111,7 @@ foreach my $file (@files)
  {   
    $quality="-phred33";
  }
- elsif ($format eq "ilumina")
+ elsif ($format eq "illumina")
  {
    $quality="-phred64";
  }
