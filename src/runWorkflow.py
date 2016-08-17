@@ -118,46 +118,44 @@ def main():
     CONFIG          = options.config
     RUNID           = options.runid
     
-    print "Before Funcs"
     f = funcs()
-    print CONFIG
     config = getConfig(CONFIG)
-    print config
     workflow = runWorkflow(config['url'], f)
     LOGPATH=config['logpath']
+    print CONFIG
     #This section is just for username conversion in the cluster can be removed in the future
     if (CONFIG != "Docker" and CONFIG != "Travis"):
        com="grep "+USERNAME+" /project/umw_biocore/svcgalaxy/conv.file|awk '{print $2}'"
        USERNAME=str(os.popen(com).readline().rstrip())
     ########
-    print "After Config"
+    print "USERNAME"
     if (USERNAME and len(USERNAME)<3): 
         print "Error:Username doesn't exist"
         sys.exit(2)
-    
+    print "OUTDIR"
     if (OUTDIR==None):
       OUTDIR="~/out"
     if (OUTDIR.find("/")==-1):
       OUTDIR="~/"+OUTDIR
-
+    print "INPUTPARAM"
     if (INPUTPARAM!=None):
         if path.isfile(INPUTPARAM) and access(INPUTPARAM, R_OK):
             INPUTPARAM = workflow.import_param(INPUTPARAM)
         else:
             INPUTPARAM = re.sub(" ", "", INPUTPARAM)
-
+    print "LOGGING"
     logging.basicConfig(filename=LOGPATH+'/run'+str(RUNID)+'.log', filemode='a',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
     logging.info(USERNAME+":"+OUTDIR)
     logging.info(INPUTPARAM)
-
+    print "WKEY"
     if (WKEY==None):
        WKEY="start"
     else:
        workflow.updateRunParams(WKEY, RUNID, logging)
-
+    print "BEFORE SERVICES"
     services=workflow.import_workflow(WORKFLOWFILE, logging)
     slen=str(len(services))    
-  
+    print slen
     wfbase = os.path.splitext(basename(WORKFLOWFILE))[0] 
     wfname = wfbase.split('.')[0]
     wkey =  workflow.startWorkflow(INPUTPARAM, DEFAULTPARAM, USERNAME, wfname, WKEY, OUTDIR, slen,logging) 
