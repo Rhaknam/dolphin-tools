@@ -118,17 +118,19 @@ def main():
     CONFIG          = options.config
     RUNID           = options.runid
     
+    print "Before Funcs"
     f = funcs()
+    print CONFIG
     config = getConfig(CONFIG)
+    print config
     workflow = runWorkflow(config['url'], f)
     LOGPATH=config['logpath']
-
     #This section is just for username conversion in the cluster can be removed in the future
     if (CONFIG != "Docker" and CONFIG != "Travis"):
        com="grep "+USERNAME+" /project/umw_biocore/svcgalaxy/conv.file|awk '{print $2}'"
        USERNAME=str(os.popen(com).readline().rstrip())
     ########
-
+    print "After Config"
     if (USERNAME and len(USERNAME)<3): 
         print "Error:Username doesn't exist"
         sys.exit(2)
