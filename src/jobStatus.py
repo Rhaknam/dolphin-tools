@@ -92,6 +92,8 @@ def main():
    RESOURCES               = options.resources
         
 
+   print CONFIG
+
    f = funcs()
    config = getConfig(CONFIG)
    jobStat = jobStatus(config['url'], f)
