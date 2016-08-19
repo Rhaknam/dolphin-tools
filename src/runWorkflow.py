@@ -154,7 +154,7 @@ def main():
        workflow.updateRunParams(WKEY, RUNID, logging)
 
     services=workflow.import_workflow(WORKFLOWFILE, logging)
-    slen=str(len(services))    
+    slen=str(len(services))
   
     wfbase = os.path.splitext(basename(WORKFLOWFILE))[0] 
     wfname = wfbase.split('.')[0]
