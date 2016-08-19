@@ -83,6 +83,7 @@ def main():
     print OUTDIR
     print USERNAME
     print RUNPARAMSID
+    print CONFIG
     
     filelist=totalReads.getFileList(RUNPARAMSID, BARCODE)
     

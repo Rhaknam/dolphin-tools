@@ -156,9 +156,6 @@ def main():
     services=workflow.import_workflow(WORKFLOWFILE, logging)
     slen=str(len(services))    
   
-    print slen
-    print services
-  
     wfbase = os.path.splitext(basename(WORKFLOWFILE))[0] 
     wfname = wfbase.split('.')[0]
     wkey =  workflow.startWorkflow(INPUTPARAM, DEFAULTPARAM, USERNAME, wfname, WKEY, OUTDIR, slen,logging) 
