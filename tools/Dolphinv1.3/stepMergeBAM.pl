@@ -100,7 +100,7 @@ foreach my $file (@files)
 	my $num=$3;
 	if ($bpath !~ "" && $bname !~ "") {
 		$bpath=~s/$num$/\*/;
-		$mergeCmd{"$bpath/$bname*$sorted.bam"}=$bname;
+		$mergeCmd{"$bpath/$bname\_[[:digit:]][[:digit:]]*$sorted.bam"}=$bname;
 	}
 }
 
