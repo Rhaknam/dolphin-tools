@@ -8,7 +8,7 @@
 @DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
 @GDB              = /home/travis/build/dolphin-genome-data/@GENOME/@VERSION
 @GCOMMONDB        = @GDB/commondb
-@JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -o @OUTDIR"
+@JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -f Travis -o @OUTDIR"
 @PUBDIR           = /home/travis/build/pub
 
 #STEPCHECK INPUT FILES
