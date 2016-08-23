@@ -7,8 +7,8 @@ def getConfig(params_section):
    parser = SafeConfigParser()
    filename = sys.path[0]+"/../default_params/config.ini"
    
-   if (not params_section):
-      params_section = "Biocore"
+   #if (not params_section):
+   #   params_section = "Biocore"
 
    parser.read(filename)
    if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
