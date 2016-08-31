@@ -237,7 +237,11 @@ sub dedupReadsAligned
 		my $multimapped;
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-1]);
-		my $name = $namelist[0];
+		if($namelist[1] == "1" || $namelist[1] == "2"){
+			my $name = $namelist[0] . "." . $namelist[1]
+		}else{
+			my $name = $namelist[0];
+		}
 		my @namelist2 = split(/_PCR_duplicates/, $name);
 		$name = $namelist2[0];
 		if ($type eq 'rsem') {
@@ -374,7 +378,11 @@ sub alteredAligned
 		my $aligned;
 		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/[\.]+/, $split_name[-2]);
-		my $name = $namelist[2];
+		if($namelist[-2] == "1" || $namelist[-2] == "2"){
+			my $name = $namelist[-3] . "." . $namelist[-2]
+		}else{
+			my $name = $namelist[-2];
+		}
 		if ($type eq 'rsem') {
 			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
 			chomp($aligned = `awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`);
