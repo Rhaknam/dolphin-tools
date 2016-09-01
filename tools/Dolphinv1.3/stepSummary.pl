@@ -277,10 +277,10 @@ sub searchAligned
 	foreach my $file (@files){
 		my $multimapped;
 		my $aligned;
-		my @split_name = split(/[\/]+/, $file);		 
+		my @split_name = split(/[\/]+/, $file);
 		my @namelist = split(/\.bam/, $split_name[-1]);
-		my $name = $namelist[0];		
- 		my @sorted = split(/\.sorted/,$namelist[0]);		
+		my $name = $namelist[0];
+ 		my @sorted = split(/\.sorted/,$namelist[0]);
                 my $name = $sorted[0];
 		if ($type eq 'rsem') {
 			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
