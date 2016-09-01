@@ -277,8 +277,8 @@ sub searchAligned
 	foreach my $file (@files){
 		my $multimapped;
 		my $aligned;
-		my @split_name = split(/[\/]+/, $file);		 +		$file=~/.*\/(.*)\..*/;
-		my @namelist = split(/\.bam/, $split_name[-1]);		 +		my $name = $1;
+		my @split_name = split(/[\/]+/, $file);		 
+		my @namelist = split(/\.bam/, $split_name[-1]);
 		my $name = $namelist[0];		
  		my @sorted = split(/\.sorted/,$namelist[0]);		
                 my $name = $sorted[0];
