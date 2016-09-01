@@ -372,7 +372,7 @@ sub alteredAligned
 	foreach my $file (@files){
 		my $multimapped;
 		my $aligned;
-		$file=~/.*\/(.*)\..*/;
+		$file=~/.*\/(.*)\..*\..*/;
 		my $name = $1;
 		if ($type eq 'rsem') {
 			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
