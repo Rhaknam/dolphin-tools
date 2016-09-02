@@ -235,11 +235,8 @@ sub dedupReadsAligned
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my $multimapped;
-		my @split_name = split(/[\/]+/, $file);
-		my @namelist = split(/[\.]+/, $split_name[-1]);
-		my $name = $namelist[0];
-		my @namelist2 = split(/_PCR_duplicates/, $name);
-		$name = $namelist2[0];
+		$file=~/.*\/(.*)\..*/;
+		my $name = $1;
 		if ($type eq 'rsem') {
 			print "awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
 			chomp($multimapped = `awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`)
@@ -281,7 +278,7 @@ sub searchAligned
 		my @namelist = split(/\.bam/, $split_name[-1]);
 		my $name = $namelist[0];
 		my @sorted = split(/\.sorted/,$namelist[0]);
-		my $name = $sorted[0];
+		$name = $sorted[0];
 		if ($type eq 'rsem') {
 			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
 			chomp($aligned = `awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`);
