@@ -207,7 +207,7 @@ sub checkAlignmentType
 		searchAligned("$outdir/merge$type", $type, "*.bam", "merge");
 	}elsif(grep( /^$outdir\/$type$/, @dirs )){
 		if ($type eq "tophat"){
-			alteredAligned("$outdir/$type", $type, "*/accepted_hits.bam", "norm");
+			alteredAligned("$outdir/$type", $type, "*/*.sorted.bam", "norm");
 		}elsif ($type eq "rsem"){
 			my $genome_check = `ls $outdir/$type/*/*genome.bam 2>&1`;
 			if ($genome_check !~ /No such file or directory/) {
@@ -372,12 +372,9 @@ sub alteredAligned
 	foreach my $file (@files){
 		my $multimapped;
 		my $aligned;
-		my @split_name = split(/[\/]+/, $file);
-		my @namelist = split(/[\.]+/, $split_name[-2]);
-		my $name = $namelist[2];
+		$file=~/.*\/(.*)\..*/;
+		my $name = $1;
 		if ($type eq 'rsem') {
-			$file=~/.*\/(.*)\..*/;
-			$name = $1;
 			$name=~s/rsem\.out\.//g;
 			$name=~s/\.genome$//g;
 			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
@@ -387,6 +384,7 @@ sub alteredAligned
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}elsif($type eq "tophat"){
+			$name=~s/\.sorted//g;
 			print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Aligned pairs:' | awk '{sum+=\$3} END {print sum}' \n";
 			chomp($aligned = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Aligned pairs:' | awk '{sum+=\$3} END {print sum}'`);
 			if ($aligned eq "") {
