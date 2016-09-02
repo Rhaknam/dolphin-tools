@@ -384,7 +384,7 @@ sub alteredAligned
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}elsif($type eq "tophat"){
-			$name=~s/\.sorted//g;
+			$name=~s/\.sorted$//g;
 			print "cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Aligned pairs:' | awk '{sum+=\$3} END {print sum}' \n";
 			chomp($aligned = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep 'Aligned pairs:' | awk '{sum+=\$3} END {print sum}'`);
 			if ($aligned eq "") {
