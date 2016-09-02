@@ -372,12 +372,14 @@ sub alteredAligned
 	foreach my $file (@files){
 		my $multimapped;
 		my $aligned;
-		$file=~/.*\/(.*)\..*/;
-		my $name = $1;
+		my @split_name = split(/[\/]+/, $file);
+		my @namelist = split(/[\.]+/, $split_name[-2]);
+		my $name = $namelist[2];
 		if ($type eq 'rsem') {
-                        $name=~s/rsem\.out\.//g;
-                        $name=~s/\.genome$//g;
-                           
+			$file=~/.*\/(.*)\..*/;
+			$name = $1;
+			$name=~s/rsem\.out\.//g;
+			$name=~s/\.genome$//g;
 			print "awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
 			chomp($aligned = `awk 'NR == 1 {print \$2}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`);
 			print "awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
