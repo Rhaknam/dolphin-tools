@@ -3,7 +3,7 @@
 @PYTHON           = python
 @JAVA             = java
 @SAMTOOLS         = samtools
-@BIN              = /usr/local/bin/dolphin-bin
+@BIN              = /home/travis/build/dolphin-bin
 @SAMTOOLSFLAG     = "@BIN/samtools-1.2/samtools"
 @DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
 @GDB              = /home/travis/build/dolphin-genome-data/@GENOME/@VERSION
