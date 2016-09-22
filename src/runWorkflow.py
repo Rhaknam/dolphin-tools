@@ -124,7 +124,7 @@ def main():
     LOGPATH=config['logpath']
 
     #This section is just for username conversion in the cluster can be removed in the future
-    if (CONFIG != "Docker"):
+    if (CONFIG != "Docker" and CONFIG != "Travis"):
        com="grep "+USERNAME+" /project/umw_biocore/svcgalaxy/conv.file|awk '{print $2}'"
        USERNAME=str(os.popen(com).readline().rstrip())
     ########

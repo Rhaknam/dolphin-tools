@@ -18,7 +18,7 @@
 @DBCOMMCMD        = "@PYTHON @DOLPHIN/dbcomm.py"
 
 #RUN BACKUPS3
-@RUNBACKUPS3      = module load python/2.7.5_packages/boto3/1.3.0 && @DOLPHIN/stepBackupS3.py
+@RUNBACKUPS3      = module load python/2.7.5_packages/simple-crypt/4.1 && module load python/2.7.5_packages/boto3/1.3.0 && @DOLPHIN/stepBackupS3.py
 
 #RUN GET_TOTAL_READ_COUNTS
 @RUNGETTOTALREADS = @PYTHON @DOLPHIN/stepGetTotalReads.py

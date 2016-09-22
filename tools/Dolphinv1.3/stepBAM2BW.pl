@@ -85,7 +85,7 @@ die "Error 15: Cannot create the directory:$puboutdir" if ($?);
 my @files=();
 my $indir="";
 my $sorted=".sorted";
-if ($type eq "RSEM")
+if (uc($type) eq "RSEM")
 {
    $indir   = "$outdir/rsem";
    @files = <$indir/*/*.genome$sorted.bam>;

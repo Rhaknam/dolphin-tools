@@ -111,19 +111,22 @@ foreach my $file (@files)
  {   
    $quality="-phred33";
  }
- elsif ($format eq "ilumina")
+ elsif ($format eq "illumina")
  {
    $quality="-phred64";
  }
 
 
  my $bname="";
+ my $pairtypecmd = "";
  if (lc($spaired) =~/^no/)
  {
     $file=~/.*\/(.*).fastq/;
     $bname=$1;
     print $file."\n\n";
-    $com="$cmd SE -threads 1 $quality -trimlog $outdir/$bname.log $file $outdir/$bname.fastq $param";  
+	#check for any surviving for single
+	$pairtypecmd = "Surviving: 0";
+    $com="$cmd SE -threads 1 $quality -trimlog $outdir/$bname.log $file $outdir/$bname.fastq $param &> $outdir/".$bname."_summary.log && cat $outdir/$bname\_summary.log";  
  }
  else
  {
@@ -133,13 +136,19 @@ foreach my $file (@files)
     my $file2=$1.".2.fastq";
     die "Error 64: please check the file:".$file2 unless (checkFile($file2));
     print "$file:$file2\n\n";
-    $com="$cmd PE -threads 1 $quality -trimlog $outdir/$bname.log $file $file2 $outdir/$bname.1.fastq $outdir/$bname.1.fastq.unpaired $outdir/$bname.2.fastq $outdir/$bname.1.fastq.unpaired $param";  
+	#check for both surviving for paired
+	$pairtypecmd = "Both Surviving: 0";
+    $com="$cmd PE -threads 1 $quality -trimlog $outdir/$bname.log $file $file2 $outdir/$bname.1.fastq $outdir/$bname.1.fastq.unpaired $outdir/$bname.2.fastq $outdir/$bname.1.fastq.unpaired $param &> $outdir/".$bname."_summary.log && cat $outdir/$bname\_summary.log";  
  }
  
  my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
- print $job."\n";   
+ print $job."\n";
  `$job`;
  die "Error 25: Cannot run the job:".$job if ($?);
+ my $jobbool = 0;
+ my $jobout = `cat $outdir/$bname\_summary.log`;
+ $jobbool = 1 if (`grep "$pairtypecmd" $outdir/$bname\_summary.log` ne "");
+ die "Error 25: Quality step returns 0 surviving reads, job:".$jobout if ($jobbool)
 }
 
 # automatic format detection

@@ -33,7 +33,7 @@ class stepBackup:
   def uploadFile(self, amazon, amazon_bucket, fastq_dir, filename ):
     try:
        passgrab = ConfigParser.ConfigParser()
-       passgrab.readfp(open('config/.salt'))
+       passgrab.readfp(open(sys.path[0]+'/../default_params/.salt'))
        s3 = boto3.resource('s3', 'us-east-1',
        aws_access_key_id=decrypt(passgrab.get('Dolphin', 'AMAZON'), unhexlify(amazon['aws_access_key_id'])),
        aws_secret_access_key=decrypt(passgrab.get('Dolphin', 'AMAZON'), unhexlify(amazon['aws_secret_access_key'])),
