@@ -71,13 +71,14 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 
 my $reportfile = "$pubdir/$wkey/reports.tsv";
 my $inputdir = "$outdir/$type";
+$inputdir = 
 $inputdir = "$outdir/seqmapping/chip" if ($type eq "chip");
-if ($type eq "tophat" || $type eq "rsem") {
+if ($type eq "tophat" || $type eq "rsem" || $type eq "star" || $type eq "hisat2") {
 	my $com=`ls -d $outdir/$type/pipe* 2>&1`;
 	my @dirs = split(/[\n\r\s\t,]+/, $com);
 	my $bamfile = "accepted_hits.bam";
 	$bamfile = "*genome.bam" if ($type eq "rsem");
-	
+	$bamfile = "*sorted.bam" if ($type eq "star" || $type eq "hisat2");
 	if ($com !~ /No such file or directory/) {
 		foreach my $dir (@dirs)
 		{
