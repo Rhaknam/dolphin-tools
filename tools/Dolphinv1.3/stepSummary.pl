@@ -257,7 +257,7 @@ sub dedupReadsAligned
 			chomp($multimapped = `cat $outdir/tophat/pipe.tophat.$name*/align_summary.txt | grep -A 1 'Aligned pairs:' | awk 'NR % 3 == 2 {sum+=\$3} END {print sum}'`)
 		}elsif($type eq "chip"){
 			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}' \n";
-			chomp($multimapped = `cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'`);
+			chomp($multimapped = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'`);
 		}else{
 			print "$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l \n";
 			chomp($multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
