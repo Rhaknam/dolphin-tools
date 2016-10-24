@@ -15,6 +15,10 @@
 @RUNDOWNLOAD      = @PYTHON @DOLPHIN/stepDownload.py
 @FASTQDUMP        = @BIN/sratoolkit.2.8.0/bin/fastq-dump
 
+#STEPCHECK INPUT FILES
+@RUNCHECK         = @PERL @DOLPHIN/stepCheck.pl
+@DBCOMMCMD        = "@PYTHON @DOLPHIN/dbcomm.py"
+
 #RUN BACKUPS3
 @RUNBACKUPS3      = @PYTHON @DOLPHIN/stepBackupS3.py
 
