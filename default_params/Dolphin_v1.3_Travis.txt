@@ -11,9 +11,9 @@
 @JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -f Travis -o @OUTDIR"
 @PUBDIR           = /home/travis/build/pub
 
-#STEPCHECK INPUT FILES
-@RUNCHECK         = @PERL @DOLPHIN/stepCheck.pl
-@DBCOMMCMD        = "@PYTHON @DOLPHIN/dbcomm.py"
+#STEPDOWNLOAD GEO IMPORTS
+@RUNDOWNLOAD      = @PYTHON @DOLPHIN/stepDownload.py
+@FASTQDUMP        = @BIN/sratoolkit.2.8.0/bin/fastq-dump
 
 #RUN BACKUPS3
 @RUNBACKUPS3      = @PYTHON @DOLPHIN/stepBackupS3.py

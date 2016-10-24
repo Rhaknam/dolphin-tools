@@ -11,6 +11,10 @@
 @JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -o @OUTDIR"
 @PUBDIR           = /export/pub 
 
+#STEPDOWNLOAD GEO IMPORTS
+@RUNDOWNLOAD      = @PYTHON @DOLPHIN/stepDownload.py
+@FASTQDUMP        = @BIN/sratoolkit.2.8.0/bin/fastq-dump
+
 #STEPCHECK INPUT FILES
 @RUNCHECK         = @PERL @DOLPHIN/stepCheck.pl
 @DBCOMMCMD        = "@PYTHON @DOLPHIN/dbcomm.py"
