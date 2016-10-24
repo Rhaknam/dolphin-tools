@@ -107,16 +107,6 @@ if ($tophat_dir ne "") {
 	checkAlignmentType($tophat_dir, "tophat");
 }
 
-my $star_dir = getDirectory($outdir, 'star');
-if ($star_dir ne "") {
-	checkAlignmentType($star_dir, "star");
-}
-
-my $hisat2_dir = getDirectory($outdir, 'hisat2');
-if ($hisat2_dir ne "") {
-	checkAlignmentType($hisat2_dir, "hisat2");
-}
-
 my $chip_dir = getDirectory($outdir, 'chip');
 if ($chip_dir ne "") {
 	checkAlignmentType($chip_dir, "chip");
@@ -226,7 +216,7 @@ sub checkAlignmentType
 				alteredAligned("$outdir/$type", $type, "*/*transcript.bam", "norm");
 			}
 		}else{
-			alteredAligned("$outdir/$type", $type, "*/*.sorted.bam", "norm");
+			searchAligned("$outdir/$type", $type, "*.bam", "norm");
 		}
 	}elsif($type eq "chip"){
 		searchAligned("$outdir/seqmapping/chip", $type, "*.bam", "norm");
@@ -245,10 +235,8 @@ sub dedupReadsAligned
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my $multimapped;
-		$file=~/.*\/(.*).*/;
-		my $file_solo = $1;
-		my @nodup = split(/_PCR_duplicates/, $file_solo);
-		my $name = $nodup[0];
+		$file=~/.*\/(.*)\..*/;
+		my $name = $1;
 		if ($type eq 'rsem') {
 			print "awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt \n";
 			chomp($multimapped = `awk 'NR == 2 {print \$3}' $outdir/rsem/pipe.rsem.$name/rsem.out.$name.stat/rsem.out.$name.cnt`)
@@ -414,20 +402,6 @@ sub alteredAligned
 			chomp($multimapped = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'`);
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, $aligned);
-		}elsif($type eq "star"){
-			print "cat $outdir/star/pipe.star.$name*/$name*Log.final.out | grep 'Uniquely mapped reads number' | awk '{sum+=\$6} END {print sum}' \n";
-			chomp($aligned = `cat $outdir/star/pipe.star.$name*/$name*Log.final.out | grep 'Uniquely mapped reads number' | awk '{sum+=\$6} END {print sum}'`);
-			print "cat $outdir/star/pipe.star.$name*/$name*Log.final.out | grep 'Number of reads mapped to' | awk 'NR % 2 == 1 {sum+=\$9}; NR % 2 == 0 {sum+=\$10} END {print sum}' \n";
-			chomp($multimapped = `cat $outdir/star/pipe.star.$name*/$name*Log.final.out | grep 'Number of reads mapped to' | awk 'NR % 2 == 1 {sum+=\$9}; NR % 2 == 0 {sum+=\$10} END {print sum}'`);
-			push($tsv{$name}, $multimapped);
-			push($tsv{$name}, (int($aligned) - int($multimapped))."");
-		}elsif($type eq "hisat2"){
-			print "cat $outdir/hisat2/pipe.hisat2.$name*/align_summary.txt | grep 'aligned concordantly exactly 1 time' | awk '{sum+=\$1} END {print sum}' \n";
-			chomp($aligned = `cat $outdir/hisat2/pipe.hisat2.$name*/align_summary.txt | grep 'aligned concordantly exactly 1 time' | awk '{sum+=\$1} END {print sum}'`);
-			print "cat $outdir/hisat2/pipe.hisat2.$name*/align_summary.txt | grep 'aligned concordantly >1 times' | awk '{sum+=\$1} END {print sum}' \n";
-			chomp($multimapped = `cat $outdir/hisat2/pipe.hisat2.$name*/align_summary.txt | grep 'aligned concordantly >1 times' | awk '{sum+=\$1} END {print sum}'`);
-			push($tsv{$name}, $multimapped);
-			push($tsv{$name}, (int($aligned) - int($multimapped))."");
 		}else{
 			print "$samtools flagstat $file \n";
 			chomp($aligned = `$samtools flagstat $file`);
