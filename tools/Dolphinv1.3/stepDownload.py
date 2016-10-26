@@ -4,13 +4,8 @@ import ConfigParser, os, re, string, sys, commands
 import warnings
 import json
 
-import boto3
-from boto3.s3.transfer import S3Transfer
-from botocore.client import Config
 from sys import argv, exit, stderr
 from optparse import OptionParser
-from binascii import hexlify, unhexlify
-from simplecrypt import encrypt, decrypt
 import GEOparse
 
 sys.path.insert(0, sys.path[0]+"/../../src")
