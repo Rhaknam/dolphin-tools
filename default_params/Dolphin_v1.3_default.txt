@@ -13,10 +13,9 @@
 @PUBDIR           = /project/umw_biocore/pub/ngstrack_pub/
 
 #STEPDOWNLOAD GEO IMPORTS
-@PANDAS           = module load python/2.7.9_packages/pandas/0.17.1
-@BIOPYTHON        = module load python/2.7.9_packages/biopython/1.66
-@GEOPARSE         = module load python/2.7.9_packages/GEOparse/0.1.7
-@RUNDOWNLOAD      = module load python/2.7.5 && @PANDAS && @BIOPYTHON && @GEOPARSE && python @DOLPHIN/stepDownload.py
+@BIOPYTHON        = module load python/2.7.5_packages/biopython/1.68
+@GEOPARSE         = module load python/2.7.5_packages/GEOparse/0.1.7
+@RUNDOWNLOAD      = module load python/2.7.5 && @BIOPYTHON && @GEOPARSE && python @DOLPHIN/stepDownload.py
 @FASTQDUMP        = @BIN/sratoolkit.2.8.0/bin/fastq-dump
 
 #STEPCHECK INPUT FILES
