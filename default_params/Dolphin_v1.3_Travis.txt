@@ -8,6 +8,7 @@
 @DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
 @GDB              = /home/travis/build/dolphin-genome-data/@GENOME/@VERSION
 @GCOMMONDB        = @GDB/commondb
+@GENOMESIZE       = @GDB/@VERSION.chrom.sizes
 @JOB              = "@PYTHON @TOOLDIR/src/runJobs.py -u @USERNAME -s @SERVICENAME -k @WKEY -f Travis -o @OUTDIR"
 @PUBDIR           = /home/travis/build/pub
 
@@ -88,6 +89,11 @@
 #stepMergeBAM
 @RUNMERGEBAM        = @DOLPHIN/stepMergeBAM.pl
 
+#Step ATACPrep
+@RUNATACPREP        = @PERL @DOLPHIN/stepATACPrep.pl
+@CUTADJUST          = @PERL @DOLPHIN/cutAdjust.pl
+@BEDTOOLSATAC       = @BIN/bedtools
+
 #Step MACS
 @RUNMACS            = @PERL @DOLPHIN/stepMACS.pl
 @MACSCMD            = "macs2 callpeak --tsize=@TSIZE --bw=@BWIDTH -g @GSIZE"
@@ -98,7 +104,6 @@
 @IGVTOOLS           = @BIN/igvtools.sh
 
 #Step Convert BW
-@GENOMESIZE         = @GDB/@VERSION.chrom.sizes
 @RUNBAM2BW          = @PERL @DOLPHIN/stepBAM2BW.pl
 @RUNCOVERAGE        = "@BIN/genomeCoverageBed" 
 @WIGTOBIGWIG        = @BIN/wigToBigWig
