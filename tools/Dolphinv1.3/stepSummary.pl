@@ -235,7 +235,7 @@ sub dedupReadsAligned
 	push(@headers, "Unique Reads Aligned $type");
 	foreach my $file (@files){
 		my $multimapped;
-		$file=~/.*\/(.*).*/;
+		$file=~/.*\/(.*)/;
 		my $file_solo = $1;
 		my @nodup = split(/_PCR_duplicates/, $file_solo);
 		my $name = $nodup[0];
