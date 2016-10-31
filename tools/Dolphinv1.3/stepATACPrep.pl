@@ -42,7 +42,7 @@ GetOptions(
     'outdir=s'       => \$outdir,
 	'previous=s',    => \$previous,
     'type=s'         => \$type,
-	'genome=s'       => \$genome, 
+	'genome=s'       => \$genome,
 	'cutajdust=s'    => \$cutadjust,
 	'bedtools=s'     => \$bedtools,
     'servicename=s'  => \$servicename,
@@ -79,7 +79,7 @@ else
 }
 
 
-$outdir  = "$outdir/atac_prep";
+$outdir  = "$outdir/adjust$type";
 `mkdir -p $outdir`;
 die "Error 15: Cannot create the directory:$outdir" if ($?);
 
