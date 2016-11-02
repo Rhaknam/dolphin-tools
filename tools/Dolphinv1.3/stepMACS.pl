@@ -100,6 +100,13 @@ foreach my $chipline (@chiplibs)
    my $inputfiles=getFiles($inputdir,$chipinput[2]);
    $com.="-c $inputfiles "; 
  }
+ if (checkFile($inputdir."/".$bname.".adjust.bam")) {
+	$com.="-f BED ";
+ }elsif(checkFile($inputdir."/".$bname.".sorted.adjust.bam")){
+	$com.="-f BED ";
+ }
+ 
+ 
  $com .= " --name=$outdir/$bname";
 
  my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
@@ -117,6 +124,8 @@ sub getFiles
  {
    my $file= $inputdir."/".$lib.".bam";
    $file=$inputdir."/".$lib.".sorted.bam" unless (checkFile($file));
+   $file=$inputdir."/".$lib.".adjust.bed" unless (checkFile($file));
+   $file=$inputdir."/".$lib.".sorted.adjust.bed" unless (checkFile($file));
    die "Error 64: please check the file:".$file unless (checkFile($file));
    push(@files, $file);
  }

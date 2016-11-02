@@ -87,8 +87,13 @@ $outdir  = "$outdir/agg";
 die "Error 15: Cannot create the directory:".$outdir  if ($?);
 
 my $com="";
-$com=`ls $inputdir/*.bam 2>&1`;
-die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
+my $ibam=" -i";
+$com=`ls $inputdir/*.adjust.bed 2>&1`;
+if ($com =~/No such file or directory/) {
+	$ibam=" -ibam";
+	$com=`ls $inputdir/*.bam 2>&1`;
+	die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
+}
 
 print $com;
 my @files = split(/[\n\r\s\t,]+/, $com);
@@ -96,10 +101,15 @@ my @files = split(/[\n\r\s\t,]+/, $com);
 foreach my $file (@files)
 {
  die "Error 64: please check the file:".$file unless (checkFile($file));
- $file=~/.*\/(.*).bam/;
+ 
+ $file=~/.*\/(.*).adjust.bed/;
  my $bname=$1;
+ if ($bname == "") {
+	$file=~/.*\/(.*).bam/;
+	$bname=$1;
+ }
  $bname=~s/\.sorted//g;
- $com = "$bedtoolsgencov -bga -ibam $file -g $genome > $outdir/$bname.bed && ";
+ $com = "$bedtoolsgencov -bga$ibam $file -g $genome > $outdir/$bname.bed && ";
  $com.= "awk '{print \\\$1\\\"\\\\t\\\"\\\$2\\\"\\\\t\\\"\\\$4}' $outdir/$bname.bed > $outdir/$bname.sig && ";
  $com.= "$act --output=$outdir/$bname.agg_plot.out $reference $outdir/$bname.sig && ";
  $com.= "$creationpdf --args $outdir/$bname.agg_plot.out ";

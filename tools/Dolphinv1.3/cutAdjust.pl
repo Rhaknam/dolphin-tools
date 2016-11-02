@@ -10,7 +10,7 @@ my $outsideRead = 10;   # outside length adjust
 my $insideRead = 10;    # inside length adjust
 my %chrom2len = ();
 
-open(GEN,"<$genome") || die("Cannot open $genome.\n");
+open(GEN, "<$genome") || die("Cannot open $genome.\n");
 while(<GEN>){
     chomp;
     my @chr = split("\t");
@@ -22,11 +22,11 @@ if ( !($bedfile =~ /\.bed$/)){
     die("Expected input file to have .bed extension.\n");
 }
 
-$bedfile=~/(.*\/(.*)).bed/;
-my $bedname = $2;
-my $out = "$outdir/$bedname.adjust.bed";\
+$bedfile=~/(.*).bed/;
+my $bedname = $1;
+my $out = "$outdir/$bedname.adjust.bed";
 
-open(BED,"<$bedfile") || die("Cannot open input file, $bedfile.\n");
+open(BED,"<$outdir/$bedfile") || die("Cannot open input file, $bedfile.\n");
 open(OUT,">$out") || die("Cannot open output file, $out.\n");
 
 while(<BED>){

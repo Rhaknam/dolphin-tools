@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
 
 #########################################################################################
-#                                    StepATACPrep.pl
+#                                    StepDeeptools.pl
 #########################################################################################
 # 
-#  This program preps reads with custom ATAC Seq parameters
+#  This step creates custom plots using deeptools
 #
 #
 #########################################################################################
@@ -24,12 +24,12 @@
 
 #################### VARIABLES ######################
  my $outdir           = "";
- my $previous         = "";
  my $jobsubmit        = "";
  my $type             = "";
- my $cutadjust        = "";
- my $genome           = "";
- my $bedtools         = "";
+ my $genomebed        = "";
+ my $plottype         = "";
+ my $reftype          = "";
+ my $deeptools        = "";
  my $servicename      = "";
  my $help             = "";
  my $print_version    = "";
@@ -40,11 +40,11 @@ my $cmd=$0." ".join(" ",@ARGV); ####command line copy
 
 GetOptions( 
     'outdir=s'       => \$outdir,
-	'previous=s',    => \$previous,
     'type=s'         => \$type,
-	'genome=s'       => \$genome,
-	'cutadjust=s'    => \$cutadjust,
-	'bedtools=s'     => \$bedtools,
+	'genomedir=s'    => \$genomebed,
+	'plottype=s'     => \$plottype,
+	'reftype=s'      => \$reftype,
+	'deeptools=s'    => \$deeptools,
     'servicename=s'  => \$servicename,
     'jobsubmit=s'    => \$jobsubmit,
     'help'           => \$help, 
@@ -68,44 +68,84 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 ################### MAIN PROGRAM ####################
 #  It runs macs14 to find the peaks using alined peaks   
 
-my $inputdir = "";
-if ($type eq "atac")
-{
-  $inputdir = "$outdir/seqmapping/atac";
-}
-else
-{
-  $inputdir = "$outdir/$type";
-}
-
-
-$outdir  = "$outdir/$type";
-`mkdir -p $outdir`;
-die "Error 15: Cannot create the directory:$outdir" if ($?);
-
 my $com = "";
-$com=`ls $inputdir/*.bam`;
-die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
-print $com;
-my @files = split(/[\n\r\s\t,]+/, $com);
-foreach my $file (@files){
-	my $jobcom = "";
-	$file=~/(.*\/(.*)).bam/;
-	my $bname=$2;
-	$jobcom .= "$bedtools bamtobed -i $file > $outdir/$bname.bed";
-	$jobcom .= " && ";
-	$jobcom .= "$cutadjust $bname.bed $outdir $genome";
-	my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$jobcom\"";
-	print $job."\n";   
-	`$job`;
-	die "Error 25: Cannot run the job:".$job if ($?);
+my $inputdir = "";
+my $bwdir = "$outdir/ucsc_$type";
+if ($plottype == "reference-point") {
+	$reftype = " --referencePoint $reftype";
+}else{
+	$reftype = "";
 }
+
+
+if ($type =~/atac/ || $type =~/chip/) {	
+	$inputdir = "$outdir/agg";
+	$outdir  = "$outdir/deeptools";
+	`mkdir -p $outdir`;
+	die "Error 15: Cannot create the directory:$outdir" if ($?);
+	$com=`ls $inputdir/*.bed`;
+	die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
+	print $com;
+	
+	my @files = split(/[\n\r\s\t,]+/, $com);
+	$com=`ls $bwdir/*.sorted.bw`;
+	print $com;
+	my $sorted=".sorted";
+	if ($com !~/No such file or directory/) {
+		$sorted="";
+	}
+	
+	my $jobcom = "";
+	foreach my $file (@files){
+		$file=~/(.*\/(.*)).bed/;
+		my $bname=$2;
+		$com="$deeptools/computeMatrix $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -out $outdir/$bname.mat.gz";
+		$com.=" && ";
+		$com.="$deeptools/plotHeatmap -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+		my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
+		print $job."\n";   
+		`$job`;
+		die "Error 25: Cannot run the job:".$job if ($?);
+	}
+}elsif ($type =~/rsem/ || $type =~/tophat/ || $type =~/bsmap/){
+	$outdir  = "$outdir/deeptools";
+	`mkdir -p $outdir`;
+	die "Error 15: Cannot create the directory:$outdir" if ($?);
+	$com=`ls $genomebed`;
+	die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
+	print $com;
+	
+	$com=`ls $bwdir/*.sorted.bw`;
+	my $sorted=".sorted";
+	if ($com !~/No such file or directory/) {
+		$sorted="";
+		$com=`ls $bwdir/*.bw`;
+		die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
+	}
+	my @files = split(/[\n\r\s\t,]+/, $com);
+	
+	my $jobcom = "";
+	foreach my $file (@files){
+		$file=~/(.*\/(.*))$sorted.bw/;
+		my $bname=$2;
+		$com="$deeptools/computeMatrix $plottype -S $file -R $genomebed -out $outdir/$bname.mat.gz";
+		$com.=" && ";
+		$com.="$deeptools/plotHeatmap -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+		my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
+		print $job."\n";   
+		`$job`;
+		die "Error 25: Cannot run the job:".$job if ($?);
+	}
+}else{
+	die "Error 64: Incorrect input type: $type";
+}
+
 
 __END__
 
 =head1 NAME
 
-stepATACPrep.pl
+stepDeeptools.pl
 
 =head1 SYNOPSIS  
 

@@ -91,7 +91,7 @@
 
 #Step ATACPrep
 @RUNATACPREP        = @PERL @DOLPHIN/stepATACPrep.pl
-@CUTADJUST          = @PERL @DOLPHIN/cutAdjust.pl
+@CUTADJUST          = "@PERL @DOLPHIN/cutAdjust.pl"
 @BEDTOOLSATAC       = @BIN/bedtools
 
 #Step MACS
@@ -107,6 +107,11 @@
 @RUNBAM2BW          = @PERL @DOLPHIN/stepBAM2BW.pl
 @RUNCOVERAGE        = "@BIN/genomeCoverageBed" 
 @WIGTOBIGWIG        = @BIN/wigToBigWig
+
+#Step DeepTools
+@RUNDEEPTOOLS       = @DOLPHIN/stepDeeptools.pl
+@DEEPTOOLS          = @BIN/deeptools2.3.6/bin
+@GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard 
 @RUNPICARD          = @DOLPHIN/stepPicard.pl
