@@ -29,7 +29,8 @@
  my $genomebed        = "";
  my $plottype         = "";
  my $reftype          = "";
- my $deeptools        = "";
+ my $deeptoolsheat    = "";
+ my $compdeeptools    = "";
  my $servicename      = "";
  my $help             = "";
  my $print_version    = "";
@@ -39,16 +40,17 @@
 my $cmd=$0." ".join(" ",@ARGV); ####command line copy
 
 GetOptions( 
-    'outdir=s'       => \$outdir,
-    'type=s'         => \$type,
-	'genomedir=s'    => \$genomebed,
-	'plottype=s'     => \$plottype,
-	'reftype=s'      => \$reftype,
-	'deeptools=s'    => \$deeptools,
-    'servicename=s'  => \$servicename,
-    'jobsubmit=s'    => \$jobsubmit,
-    'help'           => \$help, 
-    'version'        => \$print_version,
+    'outdir=s'         => \$outdir,
+    'type=s'           => \$type,
+	'genomedir=s'      => \$genomebed,
+	'plottype=s'       => \$plottype,
+	'reftype=s'        => \$reftype,
+	'deeptoolshead=s'  => \$deeptoolsheat,
+	'compdeeptools=s'  => \$compdeeptools,
+    'servicename=s'    => \$servicename,
+    'jobsubmit=s'      => \$jobsubmit,
+    'help'             => \$help, 
+    'version'          => \$print_version,
 ) or die("Unrecognized optioins.\nFor help, run this script with -help option.\n");
 
 if($help){
@@ -99,9 +101,9 @@ if ($type =~/atac/ || $type =~/chip/) {
 	foreach my $file (@files){
 		$file=~/(.*\/(.*)).bed/;
 		my $bname=$2;
-		$com="$deeptools/computeMatrix $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -out $outdir/$bname.mat.gz";
+		$com="$compdeeptools $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -out $outdir/$bname.mat.gz";
 		$com.=" && ";
-		$com.="$deeptools/plotHeatmap -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+		$com.="$deeptoolsheat -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
 		my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
 		print $job."\n";   
 		`$job`;

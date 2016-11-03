@@ -110,7 +110,8 @@
 
 #Step DeepTools
 @RUNDEEPTOOLS       = @DOLPHIN/stepDeeptools.pl
-@DEEPTOOLS          = @BIN/deepTools2.3.6/bin
+@DEEPTOOLSHEAT      = @BIN/deepTools2.3.6/bin/plotHeatmap
+@COMPDEEPTOOLS      = @BIN/deepTools2.3.6/bin/computeMatrix
 @GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard 
