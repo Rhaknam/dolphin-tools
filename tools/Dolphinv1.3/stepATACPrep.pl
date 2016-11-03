@@ -1,17 +1,17 @@
 #!/usr/bin/env perl
 
 #########################################################################################
-#                                       stepMACS.pl
+#                                    StepATACPrep.pl
 #########################################################################################
 # 
-#  This program trims the reads in the files. 
+#  This program preps reads with custom ATAC Seq parameters
 #
 #
 #########################################################################################
 # AUTHORS:
 #
-# Alper Kucukural, PhD 
-# Aug 18, 2014
+# Nicholas Merowsky
+# Oct 28, 2016
 #########################################################################################
 
 ############## LIBRARIES AND PRAGMAS ################
@@ -23,13 +23,13 @@
  use Pod::Usage; 
 
 #################### VARIABLES ######################
- my $chipinput        = "";
  my $outdir           = "";
+ my $previous         = "";
  my $jobsubmit        = "";
  my $type             = "";
- my $previous         = ""; 
- my $acmd             = "";
- my $extraparams      = "";
+ my $cutadjust        = "";
+ my $genome           = "";
+ my $bedtools         = "";
  my $servicename      = "";
  my $help             = "";
  my $print_version    = "";
@@ -39,12 +39,12 @@
 my $cmd=$0." ".join(" ",@ARGV); ####command line copy
 
 GetOptions( 
-    'inputchip=s'    => \$chipinput,
     'outdir=s'       => \$outdir,
-    'previous=s'     => \$previous,
+	'previous=s',    => \$previous,
     'type=s'         => \$type,
-    'acmd=s'         => \$acmd,
-	'extraparams=s'  => \$extraparams,
+	'genome=s'       => \$genome,
+	'cutadjust=s'    => \$cutadjust,
+	'bedtools=s'     => \$bedtools,
     'servicename=s'  => \$servicename,
     'jobsubmit=s'    => \$jobsubmit,
     'help'           => \$help, 
@@ -63,15 +63,15 @@ if($print_version){
   exit;
 }
 
-pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($chipinput eq "") or ($outdir eq "") );	
+pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );	
 
 ################### MAIN PROGRAM ####################
 #  It runs macs14 to find the peaks using alined peaks   
 
 my $inputdir = "";
-if ($type eq "chip")
+if ($type eq "atac")
 {
-  $inputdir = "$outdir/seqmapping/chip";
+  $inputdir = "$outdir/seqmapping/atac";
 }
 else
 {
@@ -79,79 +79,38 @@ else
 }
 
 
-$outdir  = "$outdir/macs";
+$outdir  = "$outdir/$type";
 `mkdir -p $outdir`;
 die "Error 15: Cannot create the directory:$outdir" if ($?);
 
-my @chiplibs=split(/:/,$chipinput);
-my $bname="";
-foreach my $chipline (@chiplibs)
-{
- print $chipline."\n";
- my @chipinput=split(/__tt__/,$chipline);
- $bname=$chipinput[0];
- my $chipfiles=getFiles($inputdir,$chipinput[1]);
- $extraparams =~ s/,/ /g;
- $extraparams =~ s/__cr____cn__/ /g;
- my $com="$acmd $extraparams -t $chipfiles ";
- 
- if (@chipinput>2 && length($chipinput[2])>=1)
- {
-   my $inputfiles=getFiles($inputdir,$chipinput[2]);
-   $com.="-c $inputfiles "; 
- }
- if (checkFile($inputdir."/".$bname.".adjust.bam")) {
-	$com.="-f BED ";
- }elsif(checkFile($inputdir."/".$bname.".sorted.adjust.bam")){
-	$com.="-f BED ";
- }
- 
- 
- $com .= " --name=$outdir/$bname";
-
- my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
- print $job."\n";   
- `$job`;
- die "Error 25: Cannot run the job:".$job if ($?);
-}
-
-sub getFiles
-{
- my ($inputdir, $libs)=@_; 
- my @libnames = split(",",$libs);
- my @files=();
- foreach my $lib (@libnames)
- {
-   my $file= $inputdir."/".$lib.".bam";
-   $file=$inputdir."/".$lib.".sorted.bam" unless (checkFile($file));
-   $file=$inputdir."/".$lib.".adjust.bed" unless (checkFile($file));
-   $file=$inputdir."/".$lib.".sorted.adjust.bed" unless (checkFile($file));
-   die "Error 64: please check the file:".$file unless (checkFile($file));
-   push(@files, $file);
- }
- return join(' ', @files);
- return $files[0];
-}
-
-sub checkFile
-{
- my ($file) = $_[0];
- return 1 if (-e $file);
- return 0;
+my $com = "";
+$com=`ls $inputdir/*.bam`;
+die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
+print $com;
+my @files = split(/[\n\r\s\t,]+/, $com);
+foreach my $file (@files){
+	my $jobcom = "";
+	$file=~/(.*\/(.*)).bam/;
+	my $bname=$2;
+	$jobcom .= "$bedtools bamtobed -i $file > $outdir/$bname.bed";
+	$jobcom .= " && ";
+	$jobcom .= "$cutadjust $bname.bed $outdir $genome";
+	my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$jobcom\"";
+	print $job."\n";   
+	`$job`;
+	die "Error 25: Cannot run the job:".$job if ($?);
 }
 
 __END__
 
-
 =head1 NAME
 
-stepMACS.pl
+stepATACPrep.pl
 
 =head1 SYNOPSIS  
 
 stepMACS.pl -o outdir <output directory> 
-            -p previous 
-            -n #reads
+            -p previous
 
 stepMACS.pl -help
 
@@ -180,19 +139,18 @@ Display the version
 
 =head1 DESCRIPTION
 
- This program map the reads to rRNAs and put the rest into other files 
+This program alters bam files for custom atacseq parameters
 
 =head1 EXAMPLE
 
 
-stepMACS.pl 
+stepATACPrep.pl 
             -o ~/out
-            -n 1000
             -p previous
 
 =head1 AUTHORS
 
- Alper Kucukural, PhD
+ Nicholas Merowsky
 
  
 =head1 LICENSE AND COPYING

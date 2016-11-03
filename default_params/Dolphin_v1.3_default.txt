@@ -9,6 +9,7 @@
 @DOLPHIN          = @TOOLDIR/tools/Dolphinv1.3
 @GDB              = /share/data/umw_biocore/genome_data/@GENOME/@VERSION
 @GCOMMONDB        = @GDB/commondb
+@GENOMESIZE       = @GDB/@VERSION.chrom.sizes
 @JOB              = "@PYTHON @TOOLDIR/src/submitJobs.py -f @CONFIG -u @USERNAME -s @SERVICENAME -k @WKEY -o @OUTDIR"
 @PUBDIR           = /project/umw_biocore/pub/ngstrack_pub/
 
@@ -94,6 +95,11 @@
 #stepMergeBAM
 @RUNMERGEBAM        = @DOLPHIN/stepMergeBAM.pl
 
+#Step ATACPrep
+@RUNATACPREP        = @PERL @DOLPHIN/stepATACPrep.pl
+@CUTADJUST          = "@PERL @DOLPHIN/cutAdjust.pl"
+@BEDTOOLSATAC       = "module load bedtools/2.17.0 && bedtools"
+
 #Step MACS
 @RUNMACS            = @PERL @DOLPHIN/stepMACS.pl
 @MACSCMD            = "macs2 callpeak --tsize=@TSIZE --bw=@BWIDTH -g @GSIZE"
@@ -104,10 +110,14 @@
 @IGVTOOLS           = @BIN/igvtools.sh
 
 #Step Convert BW
-@GENOMESIZE         = @GDB/@VERSION.chrom.sizes
 @RUNBAM2BW          = @PERL @DOLPHIN/stepBAM2BW.pl
 @RUNCOVERAGE        = @BIN/bedtools/bin/genomeCoverageBed
 @WIGTOBIGWIG        = @BIN/wigToBigWig
+
+#Step DeepTools
+@RUNDEEPTOOLS       = @DOLPHIN/stepDeeptools.pl
+@DEEPTOOLS          = @BIN/deeptools2.3.6/bin
+@GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard
 @RUNPICARD          = @DOLPHIN/stepPicard.pl
