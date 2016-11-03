@@ -117,6 +117,16 @@ if ($chip_dir ne "") {
 	}
 }
 
+my $atac_dir = getDirectory($outdir, 'atac');
+if ($atac_dir ne "") {
+	checkAlignmentType($atac_dir, "atac");
+}else{
+	my $atac_seq_dir = getDirectory($outdir, "seqmapping/atac");
+	if ($atac_seq_dir ne "") {
+		checkAlignmentType($atac_seq_dir, "atac");
+	}
+}
+
 my @keys = keys %tsv;
 my $summary = "$outd/summary_data.tsv";
 my $header_string = join("\t", @headers);
@@ -220,6 +230,8 @@ sub checkAlignmentType
 		}
 	}elsif($type eq "chip"){
 		searchAligned("$outdir/seqmapping/chip", $type, "*.bam", "norm");
+	}elsif($type eq "atac"){
+		searchAligned("$outdir/seqmapping/atac", $type, "*.bam", "norm");
 	}
 }
 
@@ -248,6 +260,9 @@ sub dedupReadsAligned
 		}elsif($type eq "chip"){
 			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}' \n";
 			chomp($multimapped = `cat $outdir/seqmapping/chip/$name.sum | awk '{sum+=\$7} END {print sum}'`);
+		}elsif($type eq "atac"){
+			print "cat $outdir/seqmapping/atac/$name*.sum | awk '{sum+=\$7} END {print sum}' \n";
+			chomp($multimapped = `cat $outdir/seqmapping/atac/$name.sum | awk '{sum+=\$7} END {print sum}'`);
 		}else{
 			print "$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l \n";
 			chomp($multimapped = `$samtools view -f 256 $directory/$name*.bam | awk '{print \$1}' | sort -u | wc -l`);
@@ -337,6 +352,27 @@ sub searchAligned
 			chomp($multimapped = `$chip_parse | awk '{sum+=\$7} END {print sum}'`);
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, $aligned);
+		}elsif($type eq "atac"){
+			my $atac_parse = "cat $outdir/seqmapping/atac/$name.sum";
+			if ($merge eq "merge") {
+				my $merged_command = "";
+				chomp(my $unmerged = `ls -d $outdir/seqmapping/atac/$name*.sum`);
+				my @unmerged_dirs = split(/[\n]+/, $unmerged);
+				foreach my $unmerge_dir (@unmerged_dirs){
+					chomp($unmerge_dir);
+					if ($unmerge_dir =~ /$name\_[\d][\d].sum$/) {
+						$merged_command .= "cat" if ($merged_command eq "");
+						$merged_command .= " $unmerge_dir";
+					}
+				}
+				$atac_parse = $merged_command;
+			}
+			print "$atac_parse | awk '{sum+=\$5} END {print sum}' \n";
+			chomp($aligned = `$atac_parse | awk '{sum+=\$5} END {print sum}'`);
+			print "$atac_parse | awk '{sum+=\$7} END {print sum}' \n";
+			chomp($multimapped = `$atac_parse | awk '{sum+=\$7} END {print sum}'`);
+			push($tsv{$name}, $multimapped);
+			push($tsv{$name}, $aligned);
 		}else{
 			print "$samtools flagstat $file \n";
 			chomp($aligned = `$samtools flagstat $file`);
@@ -402,6 +438,13 @@ sub alteredAligned
 			chomp($aligned = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$5} END {print sum}'`);
 			print "cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}' \n";
 			chomp($multimapped = `cat $outdir/seqmapping/chip/$name*.sum | awk '{sum+=\$7} END {print sum}'`);
+			push($tsv{$name}, $multimapped);
+			push($tsv{$name}, $aligned);
+		}elsif($type eq "atac"){
+			print "cat $outdir/seqmapping/atac/$name*.sum | awk '{sum+=\$5} END {print sum}' \n";
+			chomp($aligned = `cat $outdir/seqmapping/atac/$name*.sum | awk '{sum+=\$5} END {print sum}'`);
+			print "cat $outdir/seqmapping/atac/$name*.sum | awk '{sum+=\$7} END {print sum}' \n";
+			chomp($multimapped = `cat $outdir/seqmapping/atac/$name*.sum | awk '{sum+=\$7} END {print sum}'`);
 			push($tsv{$name}, $multimapped);
 			push($tsv{$name}, $aligned);
 		}else{
