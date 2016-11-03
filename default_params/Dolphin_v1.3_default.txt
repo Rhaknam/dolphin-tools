@@ -118,7 +118,7 @@
 @RUNDEEPTOOLS       = @PERL @DOLPHIN/stepDeeptools.pl
 @DEEPTOOLSPKG       = module load python/2.7.9_packages/deeptools/2.2.2 
 @NUMPYPKG           = module load python/2.7.9_packages/numpy/1.9.2
-@DEEPTOOLS          = "module unload python/2.7.5 && module load python/2.7.9 && @NUMPYPKG && @DEEPTOOLSPKG  && @BIN/deepTools2.3.6/bin"
+@DEEPTOOLS          = "module unload python/2.7.5 && module load python/2.7.9 && @NUMPYPKG && @DEEPTOOLSPKG  && "
 @GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard
