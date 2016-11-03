@@ -110,7 +110,7 @@
 
 #Step DeepTools
 @RUNDEEPTOOLS       = @DOLPHIN/stepDeeptools.pl
-@DEEPTOOLS          = @BIN/deeptools2.3.6/bin
+@DEEPTOOLS          = @BIN/deepTools2.3.6/bin
 @GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard 

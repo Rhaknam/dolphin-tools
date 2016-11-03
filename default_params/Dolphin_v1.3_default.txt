@@ -115,8 +115,8 @@
 @WIGTOBIGWIG        = @BIN/wigToBigWig
 
 #Step DeepTools
-@RUNDEEPTOOLS       = module unload python/2.7.5 && module load python/2.7.9 && module load python/2.7.9_packages/deeptools/2.2.2 && @PERL @DOLPHIN/stepDeeptools.pl
-@DEEPTOOLS          = @BIN/deeptools2.3.6/bin
+@RUNDEEPTOOLS       = @PERL @DOLPHIN/stepDeeptools.pl
+@DEEPTOOLS          = "module unload python/2.7.5 && module load python/2.7.9 && module load python/2.7.9_packages/deeptools/2.2.2 && @BIN/deepTools2.3.6/bin"
 @GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard
