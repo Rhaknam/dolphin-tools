@@ -130,9 +130,9 @@ if ($type =~/atac/ || $type =~/chip/) {
 	foreach my $file (@files){
 		$file=~/(.*\/(.*))$sorted.bw/;
 		my $bname=$2;
-		$com="$deeptools/computeMatrix $plottype -S $file -R $genomebed -out $outdir/$bname.mat.gz";
+		$com="$compdeeptools $plottype$reftype -S $file -R $genomebed -out $outdir/$bname.mat.gz";
 		$com.=" && ";
-		$com.="$deeptools/plotHeatmap -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+		$com.="$deeptoolsheat -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
 		my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
 		print $job."\n";   
 		`$job`;
