@@ -116,10 +116,9 @@
 
 #Step DeepTools
 @RUNDEEPTOOLS       = @PERL @DOLPHIN/stepDeeptools.pl
-@DEEPTOOLSPKG       = module load python/2.7.9_packages/deeptools/2.2.2 
-@NUMPYPKG           = module load python/2.7.9_packages/numpy/1.9.2
-@DEEPTOOLSHEAT      = "module unload python/2.7.5 && module load python/2.7.9 && @NUMPYPKG && @DEEPTOOLSPKG && plotHeatmap"
-@COMPDEEPTOOLS      = "module unload python/2.7.5 && module load python/2.7.9 && @NUMPYPKG && @DEEPTOOLSPKG && computeMatrix"
+@DEEPTOOLSPKG       = module load python/2.7.5_packages/deeptools/2.2.2 
+@DEEPTOOLSHEAT      = "@DEEPTOOLSPKG && plotHeatmap"
+@COMPDEEPTOOLS      = "@DEEPTOOLSPKG && computeMatrix"
 @GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard

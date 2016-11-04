@@ -1,3 +1,12 @@
+VERSOIN:	0.9.4
+DETAILS:	-Created new atac prep proceedure to time peaks and treat paired-end alignments as single end alignments
+		-Created perl script to trim and adjust peak locations for more accurate depiction of peaks
+		-Created deeptools options for when bigwig files are present.  Deeptools will create a heatmap for each sample of the run
+		-Updated stepSummary for new atacseq pipeline
+		-Updated Macs, BAM2BW, and Agg to reflect new atacseq
+		-Updated default params
+		-Changed some permissions for previous files
+
 VERSION:	0.9.3
 DETAILS:	-Summary fix for deduplication
 

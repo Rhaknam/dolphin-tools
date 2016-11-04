@@ -139,7 +139,7 @@ if ($type =~/atac/ or $type =~/chip/) {
 		die "Error 25: Cannot run the job:".$job if ($?);
 	}
 }else{
-	die "Error 64: Incorrect input type: $type";
+	die "Error 64: Incorrect input type: ($type)";
 }
 
 
