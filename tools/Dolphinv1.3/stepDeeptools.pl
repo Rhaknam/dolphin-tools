@@ -73,7 +73,7 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 my $com = "";
 my $inputdir = "";
 my $bwdir = "$outdir/ucsc_$type";
-if ($plottype == "reference-point") {
+if ($plottype =~/reference-point/) {
 	$reftype = " --referencePoint $reftype";
 }else{
 	$reftype = "";
@@ -91,9 +91,9 @@ if ($type =~/atac/ or $type =~/chip/) {
 	
 	my @files = split(/[\n\r\s\t,]+/, $com);
 	$com=`ls $bwdir/*.sorted.bw`;
-	print $com;
 	my $sorted=".sorted";
 	if ($com !~/No such file or directory/) {
+		$com=`ls $bwdir/*.bw`;
 		$sorted="";
 	}
 	
