@@ -79,8 +79,8 @@ if ($plottype == "reference-point") {
 	$reftype = "";
 }
 
-
-if ($type =~/atac/ || $type =~/chip/) {	
+print $type
+if ($type =~/atac/ or $type =~/chip/) {	
 	$inputdir = "$outdir/agg";
 	$outdir  = "$outdir/deeptools";
 	`mkdir -p $outdir`;
@@ -109,7 +109,7 @@ if ($type =~/atac/ || $type =~/chip/) {
 		`$job`;
 		die "Error 25: Cannot run the job:".$job if ($?);
 	}
-}elsif ($type =~/rsem/ || $type =~/tophat/ || $type =~/bsmap/){
+}elsif ($type =~/rsem/ or $type =~/tophat/ or $type =~/bsmap/){
 	$outdir  = "$outdir/deeptools";
 	`mkdir -p $outdir`;
 	die "Error 15: Cannot create the directory:$outdir" if ($?);
