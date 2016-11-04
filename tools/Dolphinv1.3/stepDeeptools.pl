@@ -79,7 +79,7 @@ if ($plottype == "reference-point") {
 	$reftype = "";
 }
 
-print $type
+print $type;
 if ($type =~/atac/ or $type =~/chip/) {	
 	$inputdir = "$outdir/agg";
 	$outdir  = "$outdir/deeptools";
