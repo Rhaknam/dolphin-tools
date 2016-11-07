@@ -27,6 +27,8 @@
  my $jobsubmit        = "";
  my $type             = "";
  my $genomebed        = "";
+ my $mergeallsamps    = "";
+ my $kmeans           = "";
  my $plottype         = "";
  my $reftype          = "";
  my $deeptoolsheat    = "";
@@ -43,6 +45,8 @@ GetOptions(
     'outdir=s'         => \$outdir,
     'type=s'           => \$type,
 	'genomedir=s'      => \$genomebed,
+	'mergeallsamps'    => \$mergeallsamps,
+	'kmeans=s'         => \$kmeans,
 	'plottype=s'       => \$plottype,
 	'reftype=s'        => \$reftype,
 	'deeptoolshead=s'  => \$deeptoolsheat,
@@ -79,6 +83,13 @@ if ($plottype =~/reference-point/) {
 	$reftype = "";
 }
 
+if ($kmeans !~/none/) {
+	$kmeans = " --kmeans $kmeans";
+}else{
+	$kmeans = "";
+}
+
+
 print $type;
 if ($type =~/atac/ or $type =~/chip/) {	
 	$inputdir = "$outdir/agg";
@@ -87,8 +98,6 @@ if ($type =~/atac/ or $type =~/chip/) {
 	die "Error 15: Cannot create the directory:$outdir" if ($?);
 	$com=`ls $inputdir/*.bed`;
 	die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
-	print $com;
-	
 	my @files = split(/[\n\r\s\t,]+/, $com);
 	$com=`ls $bwdir/*.sorted.bw`;
 	my $sorted=".sorted";
@@ -96,18 +105,30 @@ if ($type =~/atac/ or $type =~/chip/) {
 		$com=`ls $bwdir/*.bw`;
 		$sorted="";
 	}
-	
+	my @bwfiles = split(/[\n\r\s\t,]+/, $com);
 	my $jobcom = "";
-	foreach my $file (@files){
-		$file=~/(.*\/(.*)).bed/;
-		my $bname=$2;
-		$com="$compdeeptools $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -out $outdir/$bname.mat.gz";
+	if ($mergeallsamps=~/yes/) {
+		my $mergebw = join(' ', @bwfiles);
+		my $mergebed = join (' ', @files);
+		$com="$compdeeptools $plottype$reftype -S $mergebw -R $mergebed -out $outdir/mergedsamps.mat.gz";
 		$com.=" && ";
-		$com.="$deeptoolsheat -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
-		my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
+		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz -out $outdir/mergedsamps.heatmap.png";
+		my $job=$jobsubmit." -n ".$servicename."_merged -c \"$com\"";
 		print $job."\n";   
 		`$job`;
 		die "Error 25: Cannot run the job:".$job if ($?);
+	}else{
+		foreach my $file (@files){
+			$file=~/(.*\/(.*)).bed/;
+			my $bname=$2;
+			$com="$compdeeptools $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -out $outdir/$bname.mat.gz";
+			$com.=" && ";
+			$com.="$deeptoolsheat$kmeans -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+			my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
+			print $job."\n";   
+			`$job`;
+			die "Error 25: Cannot run the job:".$job if ($?);
+		}
 	}
 }elsif ($type =~/rsem/ or $type =~/tophat/ or $type =~/bsmap/){
 	$outdir  = "$outdir/deeptools";
@@ -115,8 +136,6 @@ if ($type =~/atac/ or $type =~/chip/) {
 	die "Error 15: Cannot create the directory:$outdir" if ($?);
 	$com=`ls $genomebed`;
 	die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
-	print $com;
-	
 	$com=`ls $bwdir/*.sorted.bw`;
 	my $sorted=".sorted";
 	if ($com !~/No such file or directory/) {
@@ -125,18 +144,28 @@ if ($type =~/atac/ or $type =~/chip/) {
 		die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
 	}
 	my @files = split(/[\n\r\s\t,]+/, $com);
-	
 	my $jobcom = "";
-	foreach my $file (@files){
-		$file=~/(.*\/(.*))$sorted.bw/;
-		my $bname=$2;
-		$com="$compdeeptools $plottype$reftype -S $file -R $genomebed -out $outdir/$bname.mat.gz";
+	if ($mergeallsamps=~/yes/) {
+		my $mergebw = join (' ', @files);
+		$com="$compdeeptools $plottype$reftype -S $mergebw -R $genomebed -out $outdir/mergedsamps.mat.gz";
 		$com.=" && ";
-		$com.="$deeptoolsheat -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
-		my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
+		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz -out $outdir/mergedsamps.heatmap.png";
+		my $job=$jobsubmit." -n ".$servicename."_merged -c \"$com\"";
 		print $job."\n";   
 		`$job`;
 		die "Error 25: Cannot run the job:".$job if ($?);
+	}else{
+		foreach my $file (@files){
+			$file=~/(.*\/(.*))$sorted.bw/;
+			my $bname=$2;
+			$com="$compdeeptools $plottype$reftype -S $file -R $genomebed -out $outdir/$bname.mat.gz";
+			$com.=" && ";
+			$com.="$deeptoolsheat -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+			my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
+			print $job."\n";   
+			`$job`;
+			die "Error 25: Cannot run the job:".$job if ($?);
+		}
 	}
 }else{
 	die "Error 64: Incorrect input type: ($type)";
