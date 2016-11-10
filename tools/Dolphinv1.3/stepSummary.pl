@@ -196,11 +196,12 @@ sub parseNormalCounts
 	chomp(my $contents = `ls $outdir/input`);
 	my @files = split(/[\n]+/, $contents);
 	foreach my $file (@files){
-		my @split_name = split(/[\.]+/, $file);
+		$file=~/(.*)\..*/;
+		my $split_name = $1;
 		chomp(my $rawcount = `wc -l $outdir/input/$file`);
 		my @counts = split(/[ ]+/, $rawcount);
 		my $finalcount = $counts[0]/4;
-		$tsv{$split_name[0]} = [$split_name[0], $finalcount];
+		$tsv{$split_name} = [$split_name, $finalcount];
 	}
 }
 
