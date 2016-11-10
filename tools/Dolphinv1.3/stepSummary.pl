@@ -182,8 +182,10 @@ sub parseRNACountFile
 		}
 	}
 	my @split_file = split(/[\/]+/, $file);
-	my @split_name = split(/[\.]+/, $split_file[-1]);
-	push(@headers, $split_name[0]);
+	my $name = $split_file[-1];
+	$name =~/(.*)\..*/;
+	my $split_name = $1;
+	push(@headers, $split_name);
 	if ($end_file) {
 		push(@headers, 'Total align');
 	}
