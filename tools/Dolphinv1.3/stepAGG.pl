@@ -73,12 +73,11 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($act eq "") or ($outdir e
 #    maps the reads to the ribosome and put the files under $outdir/after_ribosome directory
 
 my $inputdir = "";
-if ($type eq "chip")
-{
+if ($type eq "chip"){
   $inputdir = "$outdir/seqmapping/chip";
-}
-else
-{
+}elsif ($type eq "atac"){
+  $inputdir = "$outdir/seqmapping/atac";
+}else{
   $inputdir = "$outdir/$type";
 }
 

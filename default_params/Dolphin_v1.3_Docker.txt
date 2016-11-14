@@ -83,6 +83,16 @@
 @GTF                = @GDB/ucsc.gtf#Required
 @TOPHAT2CMD         = @BIN/tophat2_2.0.12/tophat2
 
+#stepSTAR
+@RUNSTAR            = @DOLPHIN/stepAlignment.pl
+@STARINDEX          = @GDB
+@COMMANDSTAR        = @BIN/STAR
+
+#steHisat2
+@RUNHISAT2          = @DOLPHIN/stepAlignment.pl
+@HISAT2INDEX        = @GDB/@VERSION
+@COMMANDHISAT2      = @BIN/hisat2/hisat2
+
 #stepSplit Fastq
 @RUNSPLIT           = @DOLPHIN/stepSplit.pl
 

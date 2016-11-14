@@ -89,7 +89,7 @@ if ($type eq "RSEM")
    my $indir   = "$outdir/rsem";
    @files = <$indir/pipe*/*.genome.sorted.bam>;
 }
-elsif ($type eq "chip" or $type eq "rsem_ref.transcripts")
+elsif ($type eq "chip" or $type eq "atac" or $type eq "rsem_ref.transcripts")
 { 
    my $indir   = "$outdir/seqmapping/$type";
    @files = <$indir/*.sorted.bam>;
@@ -97,6 +97,18 @@ elsif ($type eq "chip" or $type eq "rsem_ref.transcripts")
 elsif (lc($type) eq "tophat")
 {
    my $indir   = "$outdir/tophat";
+   print $indir."\n";
+   @files = <$indir/pipe*/*.sorted.bam>;
+}
+elsif (lc($type) eq "hisat2")
+{
+   my $indir   = "$outdir/hisat2";
+   print $indir."\n";
+   @files = <$indir/pipe*/*.sorted.bam>;
+}
+elsif (lc($type) eq "star")
+{
+   my $indir   = "$outdir/star";
    print $indir."\n";
    @files = <$indir/pipe*/*.sorted.bam>;
 }

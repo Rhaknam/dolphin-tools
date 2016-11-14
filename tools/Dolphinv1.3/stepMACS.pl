@@ -69,12 +69,11 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($chipinput eq "") or ($ou
 #  It runs macs14 to find the peaks using alined peaks   
 
 my $inputdir = "";
-if ($type eq "chip")
-{
+if ($type eq "chip"){
   $inputdir = "$outdir/seqmapping/chip";
-}
-else
-{
+}elsif ($type eq "atac"){
+  $inputdir = "$outdir/seqmapping/atac";
+}else{
   $inputdir = "$outdir/$type";
 }
 

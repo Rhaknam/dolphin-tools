@@ -70,11 +70,11 @@ $sorted = "" if ($type=~/^dedup/);
 my $inputfiles = "$outdir/$type/*$sorted.bam";
 my $outd = "$outdir/merge$type";
 print "TYPE:$type\n";
-if ($type eq "tophat") {
+if ($type eq "tophat" or $type eq "star" or $type eq "hisat2") {
     $inputfiles = "$outdir/$type/*/*$sorted.bam";
     $outd="$outdir/merge$type";
 }
-elsif ($type eq "chip" || $type =~ /^rsem_ref.transcripts/) {
+elsif ($type eq "chip" || $type eq "atac" || $type =~ /^rsem_ref.transcripts/) {
     $inputfiles = "$outdir/seqmapping/$type/*$sorted.bam";
     $outd="$outdir/merge$type";
 } else{
