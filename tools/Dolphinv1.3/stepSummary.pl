@@ -193,7 +193,7 @@ sub parseRNACountFile
 	}
 	my @split_file = split(/[\/]+/, $file);
 	my $name = $split_file[-1];
-	$name =~/(.*)\..*/;
+	$name =~/(.*)\.summary\.tsv/;
 	my $split_name = $1;
 	push(@headers, $split_name);
 	if ($end_file) {
