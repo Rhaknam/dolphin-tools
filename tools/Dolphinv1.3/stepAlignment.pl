@@ -27,7 +27,7 @@
  my $aligner          = "";
  my $outdir           = "";
  my $commandcall      = "";
- my $dspaired          = "";
+ my $dspaired         = "";
  my $params           = "";
  my $indexref         = "";
  my $previous         = "";
