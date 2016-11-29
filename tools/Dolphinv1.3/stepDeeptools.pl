@@ -20,7 +20,7 @@
  use strict;
  use File::Basename;
  use Getopt::Long;
- use Pod::Usage; 
+ use Pod::Usage;
 
 #################### VARIABLES ######################
  my $outdir           = "";
@@ -45,7 +45,7 @@ GetOptions(
     'outdir=s'         => \$outdir,
     'type=s'           => \$type,
 	'genomedir=s'      => \$genomebed,
-	'mergeallsamps'    => \$mergeallsamps,
+	'mergeallsamps=s'  => \$mergeallsamps,
 	'kmeans=s'         => \$kmeans,
 	'plottype=s'       => \$plottype,
 	'reftype=s'        => \$reftype,
@@ -110,9 +110,9 @@ if ($type =~/atac/ or $type =~/chip/) {
 	if ($mergeallsamps=~/yes/) {
 		my $mergebw = join(' ', @bwfiles);
 		my $mergebed = join (' ', @files);
-		$com="$compdeeptools $plottype$reftype -S $mergebw -R $mergebed -out $outdir/mergedsamps.mat.gz";
+		$com="$compdeeptools $plottype$reftype -S $mergebw -R $mergebed -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/mergedsamps.mat.gz";
 		$com.=" && ";
-		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz -out $outdir/mergedsamps.heatmap.png";
+		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz --heatmapHeight 15 -out $outdir/mergedsamps.heatmap.png";
 		my $job=$jobsubmit." -n ".$servicename."_merged -c \"$com\"";
 		print $job."\n";   
 		`$job`;
@@ -121,9 +121,9 @@ if ($type =~/atac/ or $type =~/chip/) {
 		foreach my $file (@files){
 			$file=~/(.*\/(.*)).bed/;
 			my $bname=$2;
-			$com="$compdeeptools $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -out $outdir/$bname.mat.gz";
+			$com="$compdeeptools $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/$bname.mat.gz";
 			$com.=" && ";
-			$com.="$deeptoolsheat$kmeans -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+			$com.="$deeptoolsheat$kmeans -m $outdir/$bname.mat.gz --heatmapHeight 15 -out $outdir/$bname.heatmap.png";
 			my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
 			print $job."\n";   
 			`$job`;
@@ -147,9 +147,9 @@ if ($type =~/atac/ or $type =~/chip/) {
 	my $jobcom = "";
 	if ($mergeallsamps=~/yes/) {
 		my $mergebw = join (' ', @files);
-		$com="$compdeeptools $plottype$reftype -S $mergebw -R $genomebed -out $outdir/mergedsamps.mat.gz";
+		$com="$compdeeptools $plottype$reftype -S $mergebw -R $genomebed -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/mergedsamps.mat.gz";
 		$com.=" && ";
-		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz -out $outdir/mergedsamps.heatmap.png";
+		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz --heatmapHeight 15 -out $outdir/mergedsamps.heatmap.png";
 		my $job=$jobsubmit." -n ".$servicename."_merged -c \"$com\"";
 		print $job."\n";   
 		`$job`;
@@ -158,9 +158,9 @@ if ($type =~/atac/ or $type =~/chip/) {
 		foreach my $file (@files){
 			$file=~/(.*\/(.*))$sorted.bw/;
 			my $bname=$2;
-			$com="$compdeeptools $plottype$reftype -S $file -R $genomebed -out $outdir/$bname.mat.gz";
+			$com="$compdeeptools $plottype$reftype -S $file -R $genomebed -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/$bname.mat.gz";
 			$com.=" && ";
-			$com.="$deeptoolsheat -m $outdir/$bname.mat.gz -out $outdir/$bname.heatmap.png";
+			$com.="$deeptoolsheat -m $outdir/$bname.mat.gz --heatmapHeight 15 -out $outdir/$bname.heatmap.png";
 			my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
 			print $job."\n";   
 			`$job`;
