@@ -1,5 +1,5 @@
 VERSION:	0.9.5
-DETAILS:	-stepSubmit memory cap increased to 1 terabyte
+DETAILS:	-submitjobs memory cap increased to 1 terabyte
 
 VERSION:	0.9.4
 DETAILS:	-stepSUmmary name fix incase '.' is present
