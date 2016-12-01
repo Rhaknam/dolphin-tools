@@ -47,8 +47,8 @@ class submitJobs:
               cputime=cputime_pred
            if(cputime_pred>=20000):
               cputime = 20000
-           if(memory>=200000):
-              memory = 200000
+           if(memory>=1000000):
+              memory = 1000000
         alist = (queue, str(cputime), str(memory), str(cpu))
         return list(alist)
 
