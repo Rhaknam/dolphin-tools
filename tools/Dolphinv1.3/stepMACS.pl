@@ -122,9 +122,15 @@ sub getFiles
  foreach my $lib (@libnames)
  {
    my $file= $inputdir."/".$lib.".bam";
-   $file=$inputdir."/".$lib.".sorted.bam" unless (checkFile($file));
-   $file=$inputdir."/".$lib.".adjust.bed" unless (checkFile($file));
-   $file=$inputdir."/".$lib.".sorted.adjust.bed" unless (checkFile($file));
+   unless (checkFile($file)){
+        $file=$inputdir."/".$lib.".sorted.bam";
+   }
+   unless (checkFile($file)){
+        $file=$inputdir."/".$lib.".adjust.bed" unless (checkFile($file));
+   }
+   unless (checkFile($file)){
+        $file=$inputdir."/".$lib.".sorted.adjust.bed" unless (checkFile($file));
+   }
    die "Error 64: please check the file:".$file unless (checkFile($file));
    push(@files, $file);
  }
