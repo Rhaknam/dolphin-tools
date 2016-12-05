@@ -135,12 +135,7 @@ sub getFiles
         $file=$inputdir."/".$lib.".1.bam";
    }
    die "Error 64: please check the file:".$file unless (checkFile($file));
-   if($file == $inputdir."/".$lib.".1.bam"){
-        push(@files, $file);
-        push(@files, $inputdir."/".$lib.".2.bam");
-   }else{
-        push(@files, $file);
-   }
+   push(@files, $file);
  }
  return join(' ', @files);
  return $files[0];
