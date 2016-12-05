@@ -131,8 +131,16 @@ sub getFiles
    unless (checkFile($file)){
         $file=$inputdir."/".$lib.".sorted.adjust.bed" unless (checkFile($file));
    }
+   unless (checkFile($file)){
+        $file=$inputdir."/".$lib.".1.bam";
+   }
    die "Error 64: please check the file:".$file unless (checkFile($file));
-   push(@files, $file);
+   if($file == $inputdir."/".$lib.".1.bam"){
+        push(@files, $file);
+        push(@files, $inputdir."/".$lib.".2.bam");
+   }else{
+        push(@files, $file);
+   }
  }
  return join(' ', @files);
  return $files[0];
