@@ -122,7 +122,7 @@ foreach my $file (@files)
     trimFiles($file, $trim1, $bname.".1", $format, $len);
     my ($format, $len)=getFormat($file2);
     print "[$len]\n";
-trimFiles($file2, $trim2, $bname.".2", $format, $len);
+    trimFiles($file2, $trim2, $bname.".2", $format, $len);
  }
 }
 
