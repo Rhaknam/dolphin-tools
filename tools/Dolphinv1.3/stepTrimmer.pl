@@ -117,12 +117,12 @@ foreach my $file (@files)
     $trim=~/([\d]*[:,][\d]*)[:,]([\d]*[:,][\d]*)/;
     my $trim1=$1;
     my $trim2=$2;
-	my ($format, $len)=getFormat($file);
-	print "[$len]\n";
-	trimFiles($file, $trim1, $bname.".1", $format, $len);
-	my ($format, $len)=getFormat($file2);
-	print "[$len]\n";
-	trimFiles($file2, $trim2, $bname.".2", $format, $len);
+    my ($format, $len)=getFormat($file);
+    print "[$len]\n";
+    trimFiles($file, $trim1, $bname.".1", $format, $len);
+    my ($format, $len)=getFormat($file2);
+    print "[$len]\n";
+trimFiles($file2, $trim2, $bname.".2", $format, $len);
  }
 }
 
