@@ -149,13 +149,13 @@ sub trimFiles
       $param .= " -l ".($len-$nts[1]) if (exists($nts[0]) && $nts[1] > 0 );
       $outfile="$outdir/$bname.fastq.$i.tmp";  
       $com="$cmd $quality -v $param -o $outfile -i $file && " if ((exists($nts[0]) && $nts[0] > 0) || (exists($nts[0]) && $nts[1] > 0 ));
-      $file=$outfile;
+      $file=$outfile if ((exists($nts[0]) && $nts[0] > 0) || (exists($nts[0]) && $nts[1] > 0 ));
     }
     if ($com!~/^$/)
     {
       $com.="mv $outfile $outdir/$bname.fastq";
       my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
-      print $job."\n";   
+      print $job."\n";
       `$job`;
 	  die "Error 25: Cannot run the job:".$job if ($?);
     }else{
