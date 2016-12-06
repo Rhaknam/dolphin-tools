@@ -117,8 +117,6 @@ foreach my $file (@files)
     $trim=~/([\d]*[:,][\d]*)[:,]([\d]*[:,][\d]*)/;
     my $trim1=$1;
     my $trim2=$2;
-	my @nts1=split(/[,:\s\t]+/,$trim1);
-	my @nts2=split(/[,:\s\t]+/,$trim2);
 	my ($format, $len)=getFormat($file);
 	print "[$len]\n";
 	trimFiles($file, $trim1, $bname.".1", $format, $len);
