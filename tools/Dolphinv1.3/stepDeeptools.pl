@@ -27,10 +27,16 @@
  my $jobsubmit        = "";
  my $type             = "";
  my $genomebed        = "";
+ my $strandspec       = "";
  my $mergeallsamps    = "";
  my $kmeans           = "";
  my $plottype         = "";
  my $reftype          = "";
+ my $before           = "";
+ my $after            = "";
+ my $lengthbody       = "";
+ my $quality          = "";
+ my $bedtoolsint      = "";
  my $deeptoolsheat    = "";
  my $compdeeptools    = "";
  my $servicename      = "";
@@ -45,10 +51,16 @@ GetOptions(
     'outdir=s'         => \$outdir,
     'type=s'           => \$type,
 	'genomedir=s'      => \$genomebed,
+	'strandspec=s'     => \$strandspec,
 	'mergeallsamps=s'  => \$mergeallsamps,
 	'kmeans=s'         => \$kmeans,
 	'plottype=s'       => \$plottype,
 	'reftype=s'        => \$reftype,
+	'before=s'         => \$before,
+	'after=s'          => \$after,
+	'lengthbody=s'     => \$lengthbody,
+	'quality=s'        => \$quality,
+	'bedtoolsint=s'    => \$bedtoolsint,
 	'deeptoolshead=s'  => \$deeptoolsheat,
 	'compdeeptools=s'  => \$compdeeptools,
     'servicename=s'    => \$servicename,
@@ -75,7 +87,6 @@ pod2usage( {'-verbose' => 0, '-exitval' => 1,} ) if ( ($outdir eq "") );
 #  It runs macs14 to find the peaks using alined peaks   
 
 my $com = "";
-my $inputdir = "";
 my $bwdir = "$outdir/ucsc_$type";
 if ($plottype =~/reference-point/) {
 	$reftype = " --referencePoint $reftype";
@@ -89,28 +100,33 @@ if ($kmeans !~/none/) {
 	$kmeans = "";
 }
 
+my $bedinputdir = "$outdir/macs";
+$outdir  = "$outdir/deeptools/$type";
+`mkdir -p $outdir`;
+die "Error 15: Cannot create the directory:$outdir" if ($?);
 
 print $type;
 if ($type =~/atac/ or $type =~/chip/) {	
-	$inputdir = "$outdir/agg";
-	$outdir  = "$outdir/deeptools";
-	`mkdir -p $outdir`;
-	die "Error 15: Cannot create the directory:$outdir" if ($?);
-	$com=`ls $inputdir/*.bed`;
+	$com=`ls $bedinputdir/*_peaks.narrowPeak`;
 	die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
 	my @files = split(/[\n\r\s\t,]+/, $com);
 	$com=`ls $bwdir/*.sorted.bw`;
-	my $sorted=".sorted";
-	if ($com !~/No such file or directory/) {
-		$com=`ls $bwdir/*.bw`;
-		$sorted="";
-	}
 	my @bwfiles = split(/[\n\r\s\t,]+/, $com);
 	my $jobcom = "";
+	my $strandflag = " -s";
+	if ($strandspec!~/yes/) {
+		$strandflag = "";
+	}
 	if ($mergeallsamps=~/yes/) {
 		my $mergebw = join(' ', @bwfiles);
 		my $mergebed = join (' ', @files);
-		$com="$compdeeptools $plottype$reftype -S $mergebw -R $mergebed -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/mergedsamps.mat.gz";
+		$com="cat $mergebed | awk '{if(\\\$5>$quality)print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)\\\"\\\\t\\\"\\\$4\\\"\\\\t\\\"\\\$5\\\"\\\\t\\\"\\\$6\\\"\\\\t\\\"\\\$7\\\"\\\\t\\\"\\\$8\\\"\\\\t\\\"\\\$9\\\"\\\\t\\\"\\\$10}' > $outdir/merged_quality.bed";
+		$com.=" && ";
+		$com.="sort -k1,1b -k2,2n $outdir/merged_quality.bed > $outdir/merged_quality.sorted.bed";
+		$com.=" && ";
+		$com.="$bedtoolsint$strandflag -u -a $genomebed -b $outdir/merged_quality.sorted.bed > $outdir/merged_quality.intersect.sorted.bed";
+		$com.=" && ";
+		$com.="$compdeeptools $plottype$reftype -S $mergebw -R $outdir/merged_quality.intersect.sorted.bed -p 4 -a $before -b $after -m $lengthbody --skipZeros -out $outdir/mergedsamps.mat.gz";
 		$com.=" && ";
 		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz --heatmapHeight 15 -out $outdir/mergedsamps.heatmap.png";
 		my $job=$jobsubmit." -n ".$servicename."_merged -c \"$com\"";
@@ -119,9 +135,15 @@ if ($type =~/atac/ or $type =~/chip/) {
 		die "Error 25: Cannot run the job:".$job if ($?);
 	}else{
 		foreach my $file (@files){
-			$file=~/(.*\/(.*)).bed/;
+			$file=~/(.*\/(.*))_peaks.narrowPeak/;
 			my $bname=$2;
-			$com="$compdeeptools $plottype$reftype -S $bwdir/$bname$sorted.bw -R $file -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/$bname.mat.gz";
+			$com="cat $bedinputdir/$bname\_peaks.narrowPeak | awk '{if(\\\$5>$quality)print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)\\\"\\\\t\\\"\\\$4\\\"\\\\t\\\"\\\$5\\\"\\\\t\\\"\\\$6\\\"\\\\t\\\"\\\$7\\\"\\\\t\\\"\\\$8\\\"\\\\t\\\"\\\$9\\\"\\\\t\\\"\\\$10}' > $outdir/$bname\_quality.bed";
+			$com.=" && ";
+			$com.="sort -k1,1b -k2,2n $outdir/$bname\_quality.bed > $outdir/$bname\_quality.sorted.bed";
+			$com.=" && ";
+			$com.="$bedtoolsint$strandflag -u -a $genomebed -b $outdir/$bname\_quality.sorted.bed > $outdir/$bname\_quality.inersect.sorted.bed";
+			$com.=" && ";
+			$com.="$compdeeptools $plottype$reftype -S $bwdir/$bname.sorted.bw -R $outdir/$bname\_quality.inersect.sorted.bed -p 4 -a $before -b $after -m $lengthbody --skipZeros -out $outdir/$bname.mat.gz";
 			$com.=" && ";
 			$com.="$deeptoolsheat$kmeans -m $outdir/$bname.mat.gz --heatmapHeight 15 -out $outdir/$bname.heatmap.png";
 			my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";
@@ -130,10 +152,7 @@ if ($type =~/atac/ or $type =~/chip/) {
 			die "Error 25: Cannot run the job:".$job if ($?);
 		}
 	}
-}elsif ($type =~/rsem/ or $type =~/tophat/ or $type =~/bsmap/){
-	$outdir  = "$outdir/deeptools";
-	`mkdir -p $outdir`;
-	die "Error 15: Cannot create the directory:$outdir" if ($?);
+}elsif ($type =~/rsem/ or $type =~/tophat/ or $type =~/bsmap/ or $type =~/star/ or $type =~/hisat2/){
 	$com=`ls $genomebed`;
 	die "Error 64: please check the if you defined the parameters right:" unless ($com !~/No such file or directory/);
 	$com=`ls $bwdir/*.sorted.bw`;
@@ -147,7 +166,7 @@ if ($type =~/atac/ or $type =~/chip/) {
 	my $jobcom = "";
 	if ($mergeallsamps=~/yes/) {
 		my $mergebw = join (' ', @files);
-		$com="$compdeeptools $plottype$reftype -S $mergebw -R $genomebed -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/mergedsamps.mat.gz";
+		$com="$compdeeptools $plottype$reftype -S $mergebw -R $genomebed -p 4 -a $before -b $after -m $lengthbody --skipZeros -out $outdir/mergedsamps.mat.gz";
 		$com.=" && ";
 		$com.="$deeptoolsheat$kmeans -m $outdir/mergedsamps.mat.gz --heatmapHeight 15 -out $outdir/mergedsamps.heatmap.png";
 		my $job=$jobsubmit." -n ".$servicename."_merged -c \"$com\"";
@@ -158,7 +177,7 @@ if ($type =~/atac/ or $type =~/chip/) {
 		foreach my $file (@files){
 			$file=~/(.*\/(.*))$sorted.bw/;
 			my $bname=$2;
-			$com="$compdeeptools $plottype$reftype -S $file -R $genomebed -p 4 -a 3000 -b 3000 --skipZeros -out $outdir/$bname.mat.gz";
+			$com="$compdeeptools $plottype$reftype -S $file -R $genomebed -p 4 -a $before -b $after -m $lengthbody --skipZeros -out $outdir/$bname.mat.gz";
 			$com.=" && ";
 			$com.="$deeptoolsheat -m $outdir/$bname.mat.gz --heatmapHeight 15 -out $outdir/$bname.heatmap.png";
 			my $job=$jobsubmit." -n ".$servicename."_".$bname." -c \"$com\"";

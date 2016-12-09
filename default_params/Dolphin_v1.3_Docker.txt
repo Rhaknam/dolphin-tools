@@ -122,6 +122,7 @@
 @RUNDEEPTOOLS       = @DOLPHIN/stepDeeptools.pl
 @DEEPTOOLSHEAT      = @BIN/deepTools2.3.6/bin/plotHeatmap
 @COMPDEEPTOOLS      = @BIN/deepTools2.3.6/bin/computeMatrix
+@BEDTOOLSINT        = "@BIN/bedtools intersect"
 @GENOMEBED          = @GDB/@VERSION.bed
 
 #Step picard 
