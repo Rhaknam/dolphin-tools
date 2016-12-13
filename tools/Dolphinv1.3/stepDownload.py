@@ -4,6 +4,7 @@ import ConfigParser, os, re, string, sys, commands
 import warnings
 import json
 import GEOparse
+import glob
 from sys import argv, exit, stderr
 from optparse import OptionParser
 
@@ -48,8 +49,11 @@ class stepDownload:
     err = child.close()
     geo = GEOparse.get_GEO(geo=geo_accession, destdir=geo_dir)
     geo.download_SRA('alper.kucukural@umassmed.edu', filetype='sra', directory=geo_dir)
-    print 'mkdir -p '+geo_sample_dir+' && mv '+geo_dir+'/Supp_'+geo_accession+'*/*.sra '+geo_sample_dir+' && '+FASTQDUMP+' --split-files '+geo_sample_dir+'/*.sra'
-    child2 = os.popen('mkdir -p '+geo_sample_dir+' && mv '+geo_dir+'/Supp_'+geo_accession+'*/*.sra '+geo_sample_dir+' && cd '+geo_sample_dir+' && '+FASTQDUMP+' --split-files '+geo_sample_dir+'/*.sra')
+    searchfile = glob.glob(geo_dir+'/Supp_'+geo_accession+'*/*.sra')
+    if(len(searchfile) == 0):
+      searchfile = glob.glob(geo_dir+'/Supp_'+geo_accession+'*/*/*.sra')
+    print 'mkdir -p '+geo_sample_dir+' && mv '+searchfile[0]+' '+geo_sample_dir+' && '+FASTQDUMP+' --split-files '+geo_sample_dir+'/*.sra'
+    child2 = os.popen('mkdir -p '+geo_sample_dir+' && mv '+searchfile[0]+' '+geo_sample_dir+' && cd '+geo_sample_dir+' && '+FASTQDUMP+' --split-files '+geo_sample_dir+'/*.sra')
     file_list = child2.read().rstrip()
     print file_list
     err = child2.close()
