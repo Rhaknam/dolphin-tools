@@ -109,6 +109,11 @@ elsif ($type eq "atac")
 	$indir   = "$outdir/seqmapping/atac";
    @files = <$indir/*.sorted.bam>;
 }
+elsif ($type eq "hisat2")
+{
+   $indir   = "$outdir/$type";
+   @files = <$indir/*/*.sorted.bam>;
+}
 else
 {
    $indir   = "$outdir/$type";
