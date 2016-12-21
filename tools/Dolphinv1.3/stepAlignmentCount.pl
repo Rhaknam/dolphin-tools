@@ -83,7 +83,7 @@ if ($type eq "tophat" || $type eq "rsem" || $type eq "star" || $type eq "hisat2"
 		foreach my $dir (@dirs)
 		{
 			if ($bamfile eq "*genome.bam") {
-				my $genome_check = `ls $outdir/$type/*/*genome.bam`;
+				my $genome_check = `ls $dir/$bamfile`;
 				if ($genome_check =~ /No such file or directory/) {
 					$bamfile = "*transcript.bam";
 				}
