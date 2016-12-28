@@ -119,12 +119,12 @@ if ($type =~/atac/ or $type =~/chip/) {
 	}
 	if ($mergeallsamps=~/yes/) {
 		my $mergebw = join(' ', @bwfiles);
-		my $mergebed = join (' ', @files);
-		$com="cat $mergebed | awk '{if(\\\$5>$quality)print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)\\\"\\\\t\\\"\\\$4\\\"\\\\t\\\"\\\$5\\\"\\\\t\\\"\\\$6\\\"\\\\t\\\"\\\$7\\\"\\\\t\\\"\\\$8\\\"\\\\t\\\"\\\$9\\\"\\\\t\\\"\\\$10}' > $outdir/merged_quality.bed";
+		my $mergebed = join (' -i ', @files);
+		$com="$bedtoolsint merge -i $mergebed | awk '{if(\\\$5>$quality)print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)\\\"\\\\t\\\"\\\$4\\\"\\\\t\\\"\\\$5\\\"\\\\t\\\"\\\$6\\\"\\\\t\\\"\\\$7\\\"\\\\t\\\"\\\$8\\\"\\\\t\\\"\\\$9\\\"\\\\t\\\"\\\$10}' > $outdir/merged_quality.bed";
 		$com.=" && ";
 		$com.="sort -k1,1b -k2,2n $outdir/merged_quality.bed > $outdir/merged_quality.sorted.bed";
 		$com.=" && ";
-		$com.="$bedtoolsint$strandflag -u -a $genomebed -b $outdir/merged_quality.sorted.bed > $outdir/merged_quality.intersect.sorted.bed";
+		$com.="$bedtoolsint intersect$strandflag -u -a $genomebed -b $outdir/merged_quality.sorted.bed > $outdir/merged_quality.intersect.sorted.bed";
 		$com.=" && ";
 		$com.="$compdeeptools $plottype$reftype -S $mergebw -R $outdir/merged_quality.intersect.sorted.bed -p 4 -a $before -b $after -m $lengthbody --skipZeros -out $outdir/mergedsamps.mat.gz";
 		$com.=" && ";
@@ -141,7 +141,7 @@ if ($type =~/atac/ or $type =~/chip/) {
 			$com.=" && ";
 			$com.="sort -k1,1b -k2,2n $outdir/$bname\_quality.bed > $outdir/$bname\_quality.sorted.bed";
 			$com.=" && ";
-			$com.="$bedtoolsint$strandflag -u -a $genomebed -b $outdir/$bname\_quality.sorted.bed > $outdir/$bname\_quality.inersect.sorted.bed";
+			$com.="$bedtoolsint intersect$strandflag -u -a $genomebed -b $outdir/$bname\_quality.sorted.bed > $outdir/$bname\_quality.inersect.sorted.bed";
 			$com.=" && ";
 			$com.="$compdeeptools $plottype$reftype -S $bwdir/$bname.sorted.bw -R $outdir/$bname\_quality.inersect.sorted.bed -p 4 -a $before -b $after -m $lengthbody --skipZeros -out $outdir/$bname.mat.gz";
 			$com.=" && ";
