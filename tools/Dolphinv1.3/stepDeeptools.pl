@@ -120,7 +120,7 @@ if ($type =~/atac/ or $type =~/chip/) {
 	if ($mergeallsamps=~/yes/) {
 		my $mergebw = join(' ', @bwfiles);
 		my $mergebed = join (' -i ', @files);
-		$com="$bedtoolsint merge -i $mergebed | awk '{print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)}' > $outdir/merged_quality.bed";
+		$com="$bedtoolsint merge -i $mergebed | awk \'{print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)}\' > $outdir/merged_quality.bed";
 		$com.=" && ";
 		$com.="sort -k1,1b -k2,2n $outdir/merged_quality.bed > $outdir/merged_quality.sorted.bed";
 		$com.=" && ";
@@ -137,7 +137,7 @@ if ($type =~/atac/ or $type =~/chip/) {
 		foreach my $file (@files){
 			$file=~/(.*\/(.*))_peaks.narrowPeak/;
 			my $bname=$2;
-			$com="awk '{if(\\\$5>$quality)print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)\\\"\\\\t\\\"\\\$4\\\"\\\\t\\\"\\\$5\\\"\\\\t\\\"\\\$6\\\"\\\\t\\\"\\\$7\\\"\\\\t\\\"\\\$8\\\"\\\\t\\\"\\\$9\\\"\\\\t\\\"\\\$10}' $bedinputdir/$bname\_peaks.narrowPeak > $outdir/$bname\_quality.bed";
+			$com="awk \'{if(\\\$5>$quality)print \\\$1\\\"\\\\t\\\"(\\\$2-$before)\\\"\\\\t\\\"(\\\$3+$after)\\\"\\\\t\\\"\\\$4\\\"\\\\t\\\"\\\$5\\\"\\\\t\\\"\\\$6\\\"\\\\t\\\"\\\$7\\\"\\\\t\\\"\\\$8\\\"\\\\t\\\"\\\$9\\\"\\\\t\\\"\\\$10}\' $bedinputdir/$bname\_peaks.narrowPeak > $outdir/$bname\_quality.bed";
 			$com.=" && ";
 			$com.="sort -k1,1b -k2,2n $outdir/$bname\_quality.bed > $outdir/$bname\_quality.sorted.bed";
 			$com.=" && ";
